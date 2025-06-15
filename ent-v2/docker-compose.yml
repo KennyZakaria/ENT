@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # File Upload Microservice
+  file-upload-service:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_SECURE=False
+      - MINIO_BUCKET_NAME=courses
+      - MINIO_PUBLIC_URL=http://localhost:9000
+      - CASSANDRA_CONTACT_POINTS=cassandra
+      - CASSANDRA_PORT=9042
+      - CASSANDRA_USERNAME=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=master
+      - KEYCLOAK_CLIENT_ID=file-upload-service
+      - MAX_FILE_SIZE=104857600
+      - ALLOWED_FILE_TYPES=pdf,doc,docx,ppt,pptx,txt,mp4
+    depends_on:
+      - minio
+      - cassandra
+      - keycloak
+    volumes:
+      - ./app:/app/app
+    restart: unless-stopped
+
+  # MinIO for file storage
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
+  # Cassandra for metadata storage
+  cassandra:
+    image: cassandra:4.0
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=course_cluster
+      - CASSANDRA_ENDPOINT_SNITCH=SimpleSnitch
+      - CASSANDRA_DC=datacenter1
+    healthcheck:
+      test: ["CMD", "cqlsh", "-u", "cassandra", "-p", "cassandra", "-e", "describe keyspaces"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # Keycloak for authentication
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.1.1
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    command: start-dev
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    restart: unless-stopped
+
+volumes:
+  minio-data:
+  cassandra-data:
+  keycloak-data:

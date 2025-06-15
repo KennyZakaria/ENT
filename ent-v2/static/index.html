@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course File Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .token-input {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #fffde7;
+            border-radius: 4px;
+            border: 1px solid #ffd54f;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+            border: 1px solid #a5d6a7;
+            display: none;
+        }
+        .error {
+            background-color: #ffebee;
+            border: 1px solid #ef9a9a;
+        }
+        .allowed-types {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Course File Upload</h1>
+    
+    <div class="container">
+        <div class="token-input">
+            <div class="form-group">
+                <label for="token">Authentication Token (JWT):</label>
+                <input type="text" id="token" placeholder="Paste your JWT token here">
+                <p><small>Note: For testing purposes, you can disable authentication by modifying the backend code.</small></p>
+            </div>
+        </div>
+
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="title">Course Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Course Description:</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="sector_id">Sector ID:</label>
+                <input type="text" id="sector_id" name="sector_id" placeholder="Optional sector identifier">
+            </div>
+            
+            <div class="form-group">
+                <label for="file">Upload File:</label>
+                <input type="file" id="file" name="file" required>
+                <div class="allowed-types">
+                    Allowed file types: pdf, doc, docx, ppt, pptx, txt, mp4 (Max size: 100MB)
+                </div>
+            </div>
+            
+            <button type="submit">Upload</button>
+        </form>
+        
+        <div id="response" class="response">
+            <h3>Response:</h3>
+            <pre id="responseContent"></pre>
+        </div>
+    </div>
+
+    <script>
+        const allowedTypes = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'mp4'];
+        const maxFileSize = 100 * 1024 * 1024; // 100MB in bytes
+
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const fileInput = document.getElementById('file');
+            const token = document.getElementById('token').value;
+            const sectorId = document.getElementById('sector_id').value;
+            
+            if (!fileInput.files[0]) {
+                alert('Please select a file to upload');
+                return;
+            }
+
+            // Client-side file validation
+            const fileExtension = fileInput.files[0].name.split('.').pop().toLowerCase();
+            if (!allowedTypes.includes(fileExtension)) {
+                alert(`File type not allowed. Allowed types: ${allowedTypes.join(', ')}`);
+                return;
+            }
+
+            if (fileInput.files[0].size > maxFileSize) {
+                alert(`File size exceeds maximum allowed size of ${maxFileSize / (1024 * 1024)}MB`);
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('file', fileInput.files[0]);
+            if (sectorId) {
+                formData.append('sector_id', sectorId);
+            }
+            
+            const responseDiv = document.getElementById('response');
+            const responseContent = document.getElementById('responseContent');
+            
+            try {
+                const response = await fetch('/courses/upload', {
+                    method: 'POST',
+                    body: formData,
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                responseDiv.style.display = 'block';
+                responseDiv.classList.toggle('error', !response.ok);
+                responseContent.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseDiv.style.display = 'block';
+                responseDiv.classList.add('error');
+                responseContent.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>

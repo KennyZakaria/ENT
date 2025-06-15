@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  calender-service:
+    build: ./calender-service
+    ports:
+      - "8002:8002"
+    environment:
+      # - MINIO_ENDPOINT=host.docker.internal:9000
+      # - MINIO_ACCESS_KEY=minioadmin
+      # - MINIO_SECRET_KEY=minioadmin
+      # - MINIO_SECURE=False
+      # - MINIO_BUCKET_NAME=courses
+      # - MINIO_PUBLIC_URL=http://localhost:9000
+      - CASSANDRA_CONTACT_POINTS=host.docker.internal
+      - CASSANDRA_PORT=9042
+      - CASSANDRA_USERNAME=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+      - KEYCLOAK_URL=http://host.docker.internal:8080
+      - KEYCLOAK_REALM=master
+      - KEYCLOAK_CLIENT_ID=file-upload-service
+      - PRESIGNED_URL_EXPIRY=3600
+    # Using existing Cassandra and Keycloak instances
+    # No dependencies needed
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./calender-service/app:/app/app
+    restart: unless-stopped
+
+  # Using existing MinIO instance running on port 9000
+  # No need to start a new MinIO container
+
+  # Using existing Cassandra instance running on port 9042
+  # No need to start a new Cassandra container
+
+  # Using existing Keycloak instance running on port 8080
+  # No need to start a new Keycloak container
+
+# No persistent volumes needed as we're using existing services
+volumes: {}
