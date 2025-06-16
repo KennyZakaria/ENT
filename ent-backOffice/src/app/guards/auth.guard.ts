@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, map } from 'rxjs';
+import { Observable, map, catchError, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
@@ -18,6 +18,10 @@ export class AuthGuard {
           this.router.navigate(['/login']);
           return false;
         }
+      }),
+      catchError(() => {
+        this.router.navigate(['/login']);
+        return of(false);
       })
     );
   }

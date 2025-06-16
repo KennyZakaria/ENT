@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Messaging App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Real-time Messaging App</h1>
+        </header>
+
+        <!-- Login Section -->
+        <section id="login-section" class="section">
+            <h2>Login</h2>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password">
+                </div>
+                <button id="login-btn" class="btn primary-btn">Login</button>
+                <p id="login-error" class="error-message"></p>
+            </div>
+        </section>
+
+        <!-- Chat Section (Hidden until logged in) -->
+        <section id="chat-section" class="section hidden">
+            <div class="user-info">
+                <p>Welcome, <span id="user-name"></span>!</p>
+                <button id="logout-btn" class="btn secondary-btn">Logout</button>
+            </div>
+            
+            <div class="chat-container">
+                <!-- Sidebar with rooms and contacts -->
+                <div class="chat-sidebar">
+                    <div class="sidebar-header">
+                        <h3>Chat Rooms</h3>
+                        <button id="create-room-btn" class="btn small-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="rooms-list" class="rooms-list">
+                        <!-- Rooms will be dynamically added here -->
+                        <p id="loading-rooms">Loading rooms...</p>
+                    </div>
+                    
+                    <div class="sidebar-header">
+                        <h3>Direct Messages</h3>
+                        <button id="new-message-btn" class="btn small-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="contacts-list" class="contacts-list">
+                        <!-- Contacts will be dynamically added here -->
+                        <p id="loading-contacts">Loading contacts...</p>
+                    </div>
+                </div>
+                
+                <!-- Main chat area -->
+                <div class="chat-main">
+                    <div id="chat-header" class="chat-header">
+                        <h3 id="current-chat-name">Select a conversation</h3>
+                        <div id="chat-participants" class="chat-participants"></div>
+                    </div>
+                    
+                    <div id="messages-container" class="messages-container">
+                        <!-- Messages will be dynamically added here -->
+                        <p class="select-chat-prompt">Select a chat to start messaging</p>
+                    </div>
+                    
+                    <div id="message-input-container" class="message-input-container hidden">
+                        <input type="text" id="message-input" placeholder="Type a message...">
+                        <button id="send-message-btn" class="btn primary-btn"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Create Room Modal -->
+        <div id="create-room-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Create New Room</h2>
+                <div class="form-group">
+                    <label for="room-name">Room Name</label>
+                    <input type="text" id="room-name" placeholder="Enter room name">
+                </div>
+                <div class="form-group">
+                    <label for="is-group">Group Chat</label>
+                    <input type="checkbox" id="is-group">
+                </div>
+                <div id="participants-container" class="form-group hidden">
+                    <label>Add Participants</label>
+                    <div id="participants-list"></div>
+                </div>
+                <button id="create-room-submit" class="btn primary-btn">Create Room</button>
+            </div>
+        </div>
+
+        <!-- New Message Modal -->
+        <div id="new-message-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>New Message</h2>
+                <div class="form-group">
+                    <label for="recipient">To:</label>
+                    <select id="recipient">
+                        <!-- Recipients will be dynamically added here -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="new-message-text">Message:</label>
+                    <textarea id="new-message-text" placeholder="Type your message"></textarea>
+                </div>
+                <button id="send-new-message" class="btn primary-btn">Send</button>
+            </div>
+        </div>
+
+        <!-- Connection Status -->
+        <div id="connection-status" class="connection-status">
+            <p id="connection-message"></p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/keycloak-js@latest/dist/keycloak.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

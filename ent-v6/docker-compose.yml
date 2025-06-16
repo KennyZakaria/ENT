@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  chat-service:
+    build: ./chat-service
+    ports:
+      - "8004:8004"
+    environment:
+      - CASSANDRA_CONTACT_POINTS=host.docker.internal
+      - CASSANDRA_PORT=9042
+      - CASSANDRA_USERNAME=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+      - KEYCLOAK_URL=http://host.docker.internal:8080
+      - KEYCLOAK_REALM=master
+      - KEYCLOAK_CLIENT_ID=file-upload-service
+    # Using existing Cassandra and Keycloak instances
+    # No dependencies needed
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./chat-service/app:/app/app
+    restart: unless-stopped
+
+  # Using existing MinIO instance running on port 9000
+  # No need to start a new MinIO container
+
+  # Using existing Cassandra instance running on port 9042
+  # No need to start a new Cassandra container
+
+  # Using existing Keycloak instance running on port 8080
+  # No need to start a new Keycloak container
+
+# No persistent volumes needed as we're using existing services
+volumes: {}

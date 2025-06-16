@@ -4,7 +4,7 @@ import {
   RippleRenderer,
   _StructuralStylesLoader,
   defaultRippleAnimationConfig
-} from "./chunk-CG46K457.js";
+} from "./chunk-O3MRWW43.js";
 import "./chunk-IBYU652R.js";
 import "./chunk-GFETCAF2.js";
 import "./chunk-2O4WY5GE.js";
@@ -12,8 +12,7 @@ import {
   FocusMonitor,
   MatCommonModule,
   _getEventTarget
-} from "./chunk-XT2I4H3V.js";
-import "./chunk-H3T65ING.js";
+} from "./chunk-TGFRM656.js";
 import {
   _CdkPrivateStyleLoader,
   _bindEventWithOptions
@@ -21,6 +20,7 @@ import {
 import {
   Platform
 } from "./chunk-BVDI3K7Z.js";
+import "./chunk-H3T65ING.js";
 import "./chunk-FJ2LSRVL.js";
 import {
   DOCUMENT

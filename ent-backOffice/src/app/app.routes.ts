@@ -7,6 +7,7 @@ import { SectorFormComponent } from './components/sectors/sector-form/sector-for
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { 
     path: 'users', 
@@ -28,5 +29,5 @@ export const routes: Routes = [
     component: SectorFormComponent,
     canActivate: [AuthGuard]
   },
-  { path: '', redirectTo: '/users', pathMatch: 'full' }
+  { path: '**', redirectTo: '/login' }
 ];
