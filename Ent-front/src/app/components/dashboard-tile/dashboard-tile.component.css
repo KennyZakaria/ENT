@@ -1,0 +1,70 @@
+.tile-container {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 90%;
+  cursor: pointer;
+  margin: 18px;
+}
+
+.tile-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.tile-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.tile-icon img {
+  width: 64px;
+  height: 64px;
+}
+
+.tile-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.tile-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.tile-description {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.tile-action {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.tile-link {
+  display: inline-block;
+  background-color: #0099cc;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.tile-link:hover {
+  background-color: #007aa3;
+}

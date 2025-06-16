@@ -1,0 +1,9 @@
+{
+  "web-origins": ["http://localhost:4200"],
+  "cors": true,
+  "cors-allowed-methods": ["POST", "PUT", "DELETE", "GET", "OPTIONS"],
+  "cors-allowed-headers": ["Authorization", "Content-Type", "X-Requested-With"],
+  "cors-exposed-headers": [],
+  "cors-allow-credentials": true,
+  "cors-max-age": 1800
+}

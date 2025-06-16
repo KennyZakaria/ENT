@@ -1,0 +1,164 @@
+<div class="support-container">
+  <div class="header">
+    <h1>Support Requests</h1>
+    <button class="create-btn" (click)="showCreateForm = true">
+      Create New Ticket
+    </button>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">
+      {{ successMessage }}
+    </div>
+  }
+
+  <!-- Create Ticket Form -->
+  @if (showCreateForm) {
+    <div class="ticket-form">
+      <h2>Create New Support Ticket</h2>
+      <form (submit)="createTicket()">
+        <div class="form-group">
+          <label for="title">Title:</label>
+          <input 
+            type="text" 
+            id="title" 
+            [(ngModel)]="newTicket.title" 
+            name="title" 
+            required
+            placeholder="Brief description of the issue"
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea 
+            id="description" 
+            [(ngModel)]="newTicket.description" 
+            name="description" 
+            required
+            placeholder="Detailed explanation of your issue..."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="priority">Priority:</label>
+          <select 
+            id="priority" 
+            [(ngModel)]="newTicket.priority" 
+            name="priority" 
+            required
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+
+        <div class="button-group">
+          <button type="submit" [disabled]="!newTicket.title || !newTicket.description || isLoading">
+            {{ isLoading ? 'Creating...' : 'Create Ticket' }}
+          </button>
+          <button type="button" (click)="cancelCreate()" [disabled]="isLoading">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+  }
+
+  <!-- Tickets List -->
+  @if (tickets.length === 0 && !isLoading) {
+    <div class="empty-state">
+      <img src="assets/icons/support.svg" alt="Support icon" class="empty-icon">
+      <p>No support tickets yet. Create one to get help!</p>
+      <button (click)="showCreateForm = true">Create New Ticket</button>
+    </div>
+  } @else {
+    <div class="tickets-grid">
+      @for (ticket of tickets; track ticket.id) {
+        <div class="ticket-card" [class.expanded]="selectedTicket?.id === ticket.id">
+          <div class="ticket-header">
+            <h2>{{ ticket.title }}</h2>
+            <div class="status-badge" [style.backgroundColor]="getStatusColor(ticket.status)">
+              {{ ticket.status }}
+            </div>
+          </div>
+
+          <div class="ticket-meta">
+            <span class="priority" [class]="ticket.priority">
+              Priority: {{ ticket.priority }}
+            </span>
+            <span class="date">
+              Created: {{ formatDate(ticket.createdAt) }}
+            </span>
+          </div>
+
+          <p class="ticket-description">{{ ticket.description }}</p>
+
+          @if (isAdmin) {
+            <div class="admin-actions">              <select 
+                [value]="ticket.status"
+                (change)="updateTicketStatus(ticket, $event)"
+                [disabled]="isLoading"
+              >
+                <option value="open">Open</option>
+                <option value="in-progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+                <option value="closed">Closed</option>
+              </select>
+            </div>
+          }
+
+          <!-- Comments Section -->
+          <div class="comments-section">
+            <h3>Comments</h3>
+            @if (ticket.comments.length === 0) {
+              <p class="no-comments">No comments yet.</p>
+            } @else {
+              <div class="comments-list">
+                @for (comment of ticket.comments; track comment.id) {
+                  <div class="comment">
+                    <div class="comment-header">
+                      <span class="comment-author">{{ comment.userName }}</span>
+                      <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
+                    </div>
+                    <p class="comment-content">{{ comment.content }}</p>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Add Comment Form -->
+            <div class="add-comment">
+              <textarea 
+                [(ngModel)]="newComment" 
+                placeholder="Add a comment..."
+                [disabled]="isLoading"
+              ></textarea>
+              <button 
+                (click)="addComment(ticket)" 
+                [disabled]="!newComment.trim() || isLoading"
+              >
+                Add Comment
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

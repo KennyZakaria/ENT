@@ -1,0 +1,52 @@
+<div class="courses-container">
+  <div class="header">
+    <h1>Online Courses</h1>
+    <button *ngIf="isTeacher" class="upload-btn" (click)="showUploadForm = true">Upload New Course</button>
+  </div>
+
+  <!-- Upload Form Modal -->
+  <div *ngIf="showUploadForm" class="modal">
+    <div class="modal-content">
+      <h2>Upload New Course</h2>
+      <div *ngIf="uploadMessage" [class]="'alert ' + (uploadError ? 'alert-error' : 'alert-success')">
+        {{ uploadMessage }}
+      </div>
+      <form (submit)="uploadCourse($event)">
+        <div class="form-group">
+          <label for="title">Title:</label>
+          <input type="text" id="title" [(ngModel)]="uploadForm.title" name="title" required>
+        </div>        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea id="description" [(ngModel)]="uploadForm.description" name="description" required></textarea>
+        </div>
+        <div class="form-group">          <label for="sector">Filière:</label>
+          <select id="sector" [(ngModel)]="uploadForm.sector_id" name="sector_id" required>
+            <option *ngFor="let sector of sectors" [value]="sector.id">{{ sector.libelle }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="file">Course File (Max {{ maxFileSize / (1024 * 1024) }}MB):</label>
+          <p class="file-info">Allowed types: PDF, ZIP, RAR, MP4, WEBM</p>
+          <input type="file" id="file" (change)="onFileSelected($event)" accept=".pdf,.zip,.rar,.mp4,.webm" required>
+          <div *ngIf="uploadForm.file" class="file-details">
+            Selected file: {{ uploadForm.file.name }} ({{ (uploadForm.file.size / (1024 * 1024)).toFixed(2) }}MB)
+          </div>
+        </div>
+        <div class="button-group">
+          <button type="submit" [disabled]="!uploadForm.file || !uploadForm.title || !uploadForm.description || isUploading">
+            {{ isUploading ? 'Uploading...' : 'Upload' }}
+          </button>
+          <button type="button" (click)="cancelUpload()" [disabled]="isUploading">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="courses-grid">
+    <div *ngFor="let course of courses" class="course-card">
+      <h2>{{ course.title }}</h2>
+      <p>{{ course.description }}</p>
+      <button (click)="downloadCourse(course.id)">Download Course</button>
+    </div>
+  </div>
+</div>

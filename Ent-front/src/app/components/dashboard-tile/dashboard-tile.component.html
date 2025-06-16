@@ -1,0 +1,12 @@
+<div class="tile-container">
+  <div class="tile-icon">
+    <img [src]="iconPath" alt="{{ title }} icon">
+  </div>
+  <div class="tile-content">
+    <h3 class="tile-title">{{ title }}</h3>
+    <p class="tile-description">{{ description }}</p>
+  </div>
+  <div class="tile-action">
+    <a [routerLink]="link" class="tile-link">Access</a>
+  </div>
+</div>
