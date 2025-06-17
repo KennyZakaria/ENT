@@ -7,6 +7,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { FullCalanderComponent } from './components/full-calander/full-calander.component';
 import { UserManagementComponent } from './components/user-management/user-management.component';
 import { AuthComponent } from './components/auth/auth.component';
+import { MessagingComponent } from './components/messaging/messaging.component';
 
 export const routes: Routes = [
   { 
@@ -51,6 +52,12 @@ export const routes: Routes = [
     component: UserManagementComponent,
     canActivate: [AuthGuard],
     data: { roles: ['admin'] }  // Only admins can access user management
+  },
+  {
+    path: 'messaging',
+    component: MessagingComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [] }  // No specific roles required, but still protected by authentication
   },
   { 
     path: '**', 

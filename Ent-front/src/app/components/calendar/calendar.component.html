@@ -1,0 +1,54 @@
+<div class="calendar-container">
+  <ng-container *ngIf="authService.isAuthenticated; else loginRequired">
+    <div class="calendar-header">
+      <div class="header-content">
+        <h2>Your Calendar</h2>
+        <select 
+          [disabled]="loading" 
+          [(ngModel)]="selectedFilierId" 
+          (change)="onSectorChange(selectedFilierId)"
+          class="sector-select">
+          <option *ngFor="let sector of userSectors" [value]="sector.id">
+            {{sector.name}}
+          </option>
+        </select>
+      </div>
+      <button (click)="refreshEvents()" [disabled]="loading">
+        <span *ngIf="!loading">Refresh</span>
+        <span *ngIf="loading">Loading...</span>
+      </button>
+    </div>
+
+    <div class="calendar-content" *ngIf="!error; else errorMessage">
+      <div *ngIf="loading" class="loading">
+        Loading events...
+      </div>
+      
+      <div *ngIf="!loading" class="events-list">
+        <div *ngFor="let event of events" class="event-item" [style.borderLeft]="'4px solid ' + event.color">
+          <h3>{{ event.title }}</h3>
+          <div class="event-time">
+            <span>Start: {{ event.start | date:'medium' }}</span>
+            <span>End: {{ event.end | date:'medium' }}</span>
+          </div>
+        </div>
+        
+        <div *ngIf="!loading && events.length === 0" class="no-events">
+          No events found for the selected sector.
+        </div>
+      </div>
+    </div>
+
+    <ng-template #errorMessage>
+      <div class="error-message">
+        {{ error }}
+      </div>
+    </ng-template>
+  </ng-container>
+
+  <ng-template #loginRequired>
+    <div class="login-required">
+      <p>Please log in to view your calendar</p>
+    </div>
+  </ng-template>
+</div>

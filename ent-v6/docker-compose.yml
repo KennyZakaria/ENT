@@ -13,6 +13,7 @@ services:
       - KEYCLOAK_URL=http://host.docker.internal:8080
       - KEYCLOAK_REALM=master
       - KEYCLOAK_CLIENT_ID=file-upload-service
+      - USER_MANAGEMENT_URL=http://host.docker.internal:8003
     # Using existing Cassandra and Keycloak instances
     # No dependencies needed
     extra_hosts:

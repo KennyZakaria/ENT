@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CourseDownloadService, Course } from '../../services/download.service';
 import { UploadService } from '../../services/upload.service';
-import { AuthService } from '../../services/auth.service';
+import { AuthNewService } from '../../services/auth-new.service';
 import { Sector, SECTORS } from '../../constants/sectors';
 import { environment } from '../../../environments/environment';
 
@@ -41,7 +41,7 @@ export class CoursesComponent implements OnInit {
   constructor(
     private courseService: CourseDownloadService,
     private uploadService: UploadService,
-    private authService: AuthService
+    private authService: AuthNewService
   ) {}
 
   ngOnInit() {
@@ -49,15 +49,9 @@ export class CoursesComponent implements OnInit {
     this.checkTeacherRole();
   }
 
-  private async checkTeacherRole() {
-    try {
-      await this.authService.isLoggedIn();
-      this.isTeacher = this.authService.isUserInRole('teacher');
-      console.log('Is user teacher:', this.isTeacher);
-    } catch (error: any) {
-      console.error('Failed to check teacher role:', error);
-      this.isTeacher = false;
-    }
+  private checkTeacherRole() {
+    this.isTeacher = this.authService.isUserInRole('teacher');
+    console.log('Is user teacher:', this.isTeacher);
   }
 
   private loadCourses() {
@@ -115,7 +109,11 @@ export class CoursesComponent implements OnInit {
         throw new Error(`File size exceeds ${this.maxFileSize / (1024 * 1024)}MB limit`);
       }
 
-      const token = await this.authService.getToken();
+      const token = this.authService.currentToken?.access_token;
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
       await this.uploadService.uploadCourseFile(
         this.uploadForm.file,
         this.uploadForm.title,

@@ -20,6 +20,14 @@ class ChatRoom(BaseModel):
     created_by: str
     is_group: bool = False
 
+    def __hash__(self):
+        return hash(self.room_id)  # Use room_id for hashing since it's unique
+        
+    def __eq__(self, other):
+        if not isinstance(other, ChatRoom):
+            return False
+        return self.room_id == other.room_id  # Compare rooms by their ID
+
 class RoomParticipant(BaseModel):
     """Model for chat room participants."""
     room_id: str

@@ -1,0 +1,92 @@
+<div class="messaging-container">
+  <div class="sidebar">
+    <div class="rooms-header">
+      <h2>Chat Rooms</h2>
+      <button class="create-room-btn" (click)="showCreateRoom = true">
+        <i class="fas fa-plus"></i> New Room
+      </button>
+    </div>
+
+    <div class="connection-status" [class.disconnected]="!isConnected">
+      <span class="status-indicator"></span>
+      {{ isConnected ? 'Connected' : 'Disconnected' }}
+      <button *ngIf="!isConnected" (click)="retryConnection()" class="retry-btn">
+        Reconnect
+      </button>
+    </div>
+
+    <div class="create-room-form" *ngIf="showCreateRoom">
+      <input type="text" [(ngModel)]="newRoomName" placeholder="Room name" />
+      
+      <div class="participants-selector">
+        <h4>Select Participants</h4>
+        <div class="participants-list">
+          <div *ngFor="let user of availableUsers" 
+               class="participant-item"
+               [class.selected]="selectedParticipants.includes(user.id)"
+               (click)="toggleParticipant(user.id)">
+            <span class="participant-name">{{ user.username }}</span>
+            <span class="check-mark" *ngIf="selectedParticipants.includes(user.id)">✓</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button [disabled]="!newRoomName.trim() || selectedParticipants.length === 0" 
+                (click)="createRoom()">Create</button>
+        <button class="cancel" (click)="showCreateRoom = false">Cancel</button>
+      </div>
+    </div>
+
+    <div class="rooms-list">
+      <div *ngFor="let room of rooms" 
+           class="room-item"
+           [class.active]="selectedRoom?.room_id === room.room_id"
+           (click)="selectRoom(room)">
+        <div class="room-name">{{ room.name }}</div>
+        <div class="room-info">
+          <span class="participant-count">{{ room.is_group ? 'Group' : 'Direct' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-area" *ngIf="selectedRoom; else noRoomSelected">
+    <div class="chat-header">
+      <h3>{{ selectedRoom.name }}</h3>
+      <div class="participants" *ngIf="selectedRoom.is_group">
+        <span>{{ participants.length }} participants</span>
+      </div>
+    </div>
+
+    <div class="messages-container">
+      <div class="message" *ngFor="let message of messages"
+           [class.own-message]="message.sender_id === currentUserId">
+        <div class="message-content">
+          <div class="message-text">{{ message.content }}</div>
+          <div class="message-meta">
+            <span class="timestamp">{{ formatTimestamp(message.timestamp) }}</span>
+            <span class="read-status" *ngIf="message.sender_id === currentUserId">
+              {{ message.read ? '✓✓' : '✓' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="message-input">
+      <input type="text" 
+             [(ngModel)]="newMessage" 
+             placeholder="Type a message..."
+             (keyup.enter)="sendMessage()"
+             [disabled]="!isConnected" />
+      <button (click)="sendMessage()" [disabled]="!isConnected">Send</button>
+    </div>
+  </div>
+
+  <ng-template #noRoomSelected>
+    <div class="no-room-selected">
+      <p>Select a chat room to start messaging</p>
+    </div>
+  </ng-template>
+</div>

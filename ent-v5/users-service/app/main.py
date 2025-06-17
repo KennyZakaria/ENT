@@ -80,7 +80,7 @@ async def create_user(user: NewUserRequest):
 async def list_sectors(current_user: KeycloakUser = Depends(get_current_user)):
     """List all sectors/filiers"""
     session = get_cassandra_session()
-    rows = session.execute("SELECT * FROM sectors")
+    rows = session.execute("SELECT * FROM users.sectors")
     return [Sector(**row) for row in rows]
 
 @app.post("/sectors/", response_model=Sector)
@@ -91,7 +91,7 @@ async def create_sector(
     """Create a new sector/filier"""
     session = get_cassandra_session()
     session.execute("""
-        INSERT INTO sectors (id, name, description)
+        INSERT INTO users.sectors (id, name, description)
         VALUES (%s, %s, %s)
     """, (sector.id, sector.name, sector.description))
     return sector

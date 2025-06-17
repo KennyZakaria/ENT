@@ -56,4 +56,8 @@ export class UserManagementService {
     }
     return this.http.get<KeycloakUser[]>(url);
   }
+
+  getAllUsers(): Observable<KeycloakUser[]> {
+    return this.http.get<KeycloakUser[]>(`${this.baseUrl}/users`);
+  }
 }

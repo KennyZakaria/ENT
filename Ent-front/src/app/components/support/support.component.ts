@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthNewService } from '../../services/auth-new.service';
 import { SupportService, SupportTicket, CreateTicketRequest } from '../../services/support.service';
-import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-support',
@@ -14,6 +14,7 @@ import { AuthService } from '../../services/auth.service';
 export class SupportComponent implements OnInit {
   tickets: SupportTicket[] = [];
   isAdmin = false;
+  isTeacher = false;
   showCreateForm = false;
   selectedTicket: SupportTicket | null = null;
   newComment = '';
@@ -30,23 +31,16 @@ export class SupportComponent implements OnInit {
 
   constructor(
     private supportService: SupportService,
-    private authService: AuthService
+    private authService: AuthNewService
   ) {}
 
   ngOnInit() {
+    this.checkTeacherRole();
     this.loadTickets();
-    this.checkAdminRole();
   }
 
-  private async checkAdminRole() {
-    try {
-      await this.authService.isLoggedIn();
-      this.isAdmin = this.authService.isUserInRole('admin');
-      console.log('Is user admin:', this.isAdmin);
-    } catch (error) {
-      console.error('Failed to check admin role:', error);
-      this.isAdmin = false;
-    }
+  private checkTeacherRole() {
+    this.isTeacher = this.authService.isUserInRole('teacher');
   }
 
   private loadTickets() {

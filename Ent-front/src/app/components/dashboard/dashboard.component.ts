@@ -26,7 +26,7 @@ export class DashboardComponent implements OnInit {
       title: 'Messages',
       iconPath: 'assets/icons/message.svg',
       description: 'Access your university messaging system',
-      link: '/messages'
+      link: '/messaging'
     },
     {
       title: 'Notes',

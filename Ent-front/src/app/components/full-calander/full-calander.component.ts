@@ -7,7 +7,7 @@ import { FullCalendarModule } from '@fullcalendar/angular';
 import { CommonModule } from '@angular/common';
 import { CalendarService, CalendarEvent } from '../../services/calendar.service';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
+import { AuthNewService } from '../../services/auth-new.service';
 
 @Component({
   selector: 'app-calendar',
@@ -145,7 +145,7 @@ export class FullCalanderComponent implements OnInit {
 
   constructor(
     private calendarService: CalendarService,
-    private authService: AuthService
+    private authService: AuthNewService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -153,14 +153,8 @@ export class FullCalanderComponent implements OnInit {
   }
 
   private async checkTeacherRole() {
-    try {
-      await this.authService.isLoggedIn();
-      this.isTeacher = this.authService.isUserInRole('teacher');
-      console.log('Is user teacher:', this.isTeacher);
-    } catch (error) {
-      console.error('Failed to check teacher role:', error);
-      this.isTeacher = false;
-    }
+    this.isTeacher = this.authService.isUserInRole('teacher');
+    console.log('Is user teacher:', this.isTeacher);
   }
 
   showAddEventForm() {

@@ -221,20 +221,12 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         token = credentials.credentials
         key = get_keycloak_public_key()
         
-        # Decode without verifying first to get the unverified payload
-        unverified_payload = jwt.get_unverified_claims(token)
-        
-        # Check if we need to verify audience
-        options = {
-            'verify_aud': False  # Skip audience validation for now
-        }
-        
         # Decode and verify the token
         payload = jwt.decode(
             token,
             key,
             algorithms=["RS256"],
-            options=options
+            options={'verify_aud': False}  # Skip audience validation
         )
         
         user_id = payload.get("sub")
@@ -242,7 +234,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             raise credentials_exception
             
         # Get full user information from Keycloak
-        return await get_keycloak_user(user_id)
+        return await get_user_from_keycloak(user_id)
         
     except JWTError as e:
         print(f"JWT Error: {str(e)}")  # For debugging
