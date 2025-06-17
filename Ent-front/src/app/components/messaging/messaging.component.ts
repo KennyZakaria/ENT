@@ -26,6 +26,7 @@ export class MessagingComponent implements OnInit, OnDestroy {
   isConnected = false;
   availableUsers: KeycloakUser[] = [];
   selectedParticipants: string[] = [];
+  userMap: Map<string, string> = new Map<string, string>();
   
   private destroy$ = new Subject<void>();
 
@@ -148,6 +149,16 @@ export class MessagingComponent implements OnInit, OnDestroy {
       next: (users: KeycloakUser[]) => {
         // Filter out current user from the list
         this.availableUsers = users.filter(user => user.id !== this.currentUserId);
+        
+        // Create a map of user IDs to usernames for displaying sender names
+        users.forEach(user => {
+          this.userMap.set(user.id, user.username);
+        });
+        
+        // Add current user to the map
+        if (this.authService.currentUser) {
+          this.userMap.set(this.currentUserId, this.authService.currentUser.username);
+        }
       },
       error: (error: unknown) => console.error('Error loading users:', error)
     });
@@ -191,5 +202,9 @@ export class MessagingComponent implements OnInit, OnDestroy {
   formatTimestamp(timestamp: string | undefined): string {
     if (!timestamp) return '';
     return new Date(timestamp).toLocaleString();
+  }
+  
+  getSenderName(senderId: string): string {
+    return this.userMap.get(senderId) || 'Unknown User';
   }
 }

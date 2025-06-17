@@ -319,3 +319,10 @@ button:disabled {
     max-width: 85%;
   }
 }
+
+.sender-name {
+  font-size: 0.8em;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 4px;
+}

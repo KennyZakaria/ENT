@@ -80,7 +80,7 @@ async def create_user(user: NewUserRequest):
 async def list_sectors(current_user: KeycloakUser = Depends(get_current_user)):
     """List all sectors/filiers"""
     session = get_cassandra_session()
-    rows = session.execute("SELECT * FROM users.sectors")
+    rows = session.execute("SELECT id, name, description FROM users.sectors")
     return [Sector(**row) for row in rows]
 
 @app.post("/sectors/", response_model=Sector)
@@ -97,29 +97,37 @@ async def create_sector(
     return sector
 
 @app.get("/users/{user_id}/sectors", response_model=UserSectorInfo)
-async def get_user_sectors(
-    user_id: str,
-    current_user: KeycloakUser = Depends(get_current_user)
-):
+async def get_user_sectors(user_id: str, current_user: KeycloakUser = Depends(get_current_user)):
     """Get sectors for a specific user"""
     session = get_cassandra_session()
-    
     # First get the user from Keycloak to verify existence and get role
-    user = await get_current_user(user_id)
+    user = await get_keycloak_user(user_id)
     
     # Get sectors based on role
     if "app_student" in user.roles:
-        rows = session.execute("""
-            SELECT s.* FROM sectors s
-            JOIN student_sectors ss ON s.id = ss.sector_id
-            WHERE ss.student_id = %s
-        """, (user_id,))
+        # First get the sector IDs for the student
+        sector_ids_rows = session.execute(
+            "SELECT sector_id FROM users.student_sectors WHERE student_id = %s",
+            (user_id,)
+        )
+        sector_ids = [row['sector_id'] for row in sector_ids_rows]
     else:  # teacher
-        rows = session.execute("""
-            SELECT s.* FROM sectors s
-            JOIN teacher_sectors ts ON s.id = ts.sector_id
-            WHERE ts.teacher_id = %s
-        """, (user_id,))
+        # First get the sector IDs for the teacher
+        sector_ids_rows = session.execute(
+            "SELECT sector_id FROM users.teacher_sectors WHERE teacher_id = %s",
+            (user_id,)
+        )
+        sector_ids = [row['sector_id'] for row in sector_ids_rows]
+    
+    # Then get the sector details for those IDs
+    if sector_ids:
+        placeholders = ','.join(['%s'] * len(sector_ids))
+        rows = session.execute(
+            f"SELECT id, name, description FROM users.sectors WHERE id IN ({placeholders})",
+            sector_ids
+        )
+    else:
+        rows = []
     
     sectors = [Sector(**row) for row in rows]
     return UserSectorInfo(user_id=user_id, sectors=sectors)

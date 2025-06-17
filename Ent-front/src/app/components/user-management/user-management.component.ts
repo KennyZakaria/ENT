@@ -61,6 +61,43 @@ import { KeycloakUser } from '../../services/auth-new.service';
         </div>
       </div>
 
+      <div class="section">
+        <h2>All Users</h2>
+        <div class="search-filter">
+          <input type="text" [(ngModel)]="searchTerm" placeholder="Search users..." (input)="filterUsers()">
+          <select [(ngModel)]="roleFilter" (change)="filterUsers()">
+            <option value="">All Roles</option>
+            <option value="teacher">Teachers</option>
+            <option value="student">Students</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Roles</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of filteredUsers">
+              <td>{{ user.username }}</td>
+              <td>{{ user.firstName }} {{ user.lastName }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.roles.join(', ') }}</td>
+              <td>
+                <button class="delete-btn" (click)="confirmDeleteUser(user)">Delete</button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredUsers.length === 0">
+              <td colspan="5" class="no-results">No users found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <div class="section" *ngIf="selectedSector">
         <h2>Users in {{ selectedSector.name }}</h2>
         <div class="role-filter">
@@ -86,6 +123,19 @@ import { KeycloakUser } from '../../services/auth-new.service';
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Delete Confirmation Modal -->
+      <div class="modal" *ngIf="showDeleteModal">
+        <div class="modal-content">
+          <h3>Confirm Delete</h3>
+          <p>Are you sure you want to delete user <strong>{{ userToDelete?.username }}</strong>?</p>
+          <p class="warning">This action cannot be undone.</p>
+          <div class="modal-actions">
+            <button class="cancel-btn" (click)="showDeleteModal = false">Cancel</button>
+            <button class="delete-btn" (click)="deleteUser()">Delete</button>
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -152,11 +202,12 @@ import { KeycloakUser } from '../../services/auth-new.service';
     th {
       background-color: #f8f9fa;
     }
-    .role-filter {
+    .role-filter, .search-filter {
       margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
     }
-    .role-filter button {
-      margin-right: 10px;
+    .role-filter button, button[type="submit"] {
       padding: 8px 16px;
       border: none;
       border-radius: 4px;
@@ -164,8 +215,73 @@ import { KeycloakUser } from '../../services/auth-new.service';
       color: white;
       cursor: pointer;
     }
-    .role-filter button:hover {
+    .role-filter button:hover, button[type="submit"]:hover {
       background: #0056b3;
+    }
+    .search-filter input, .search-filter select {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .search-filter input {
+      flex: 1;
+    }
+    .delete-btn {
+      padding: 6px 12px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .delete-btn:hover {
+      background: #c82333;
+    }
+    .no-results {
+      text-align: center;
+      padding: 20px;
+      color: #6c757d;
+    }
+    /* Modal styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 400px;
+      max-width: 90%;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .cancel-btn {
+      padding: 8px 16px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .cancel-btn:hover {
+      background: #5a6268;
+    }
+    .warning {
+      color: #dc3545;
+      font-weight: bold;
     }
   `]
 })
@@ -175,6 +291,23 @@ export class UserManagementComponent implements OnInit {
   selectedSector: Sector | null = null;
   message = '';
   error = false;
+  sectorMessage = '';
+  sectorError = false;
+
+  // All users list
+  allUsers: KeycloakUser[] = [];
+  filteredUsers: KeycloakUser[] = [];
+  searchTerm = '';
+  roleFilter = '';
+
+  // Delete user modal
+  showDeleteModal = false;
+  userToDelete: KeycloakUser | null = null;
+
+  newSector: Sector = {
+    name: '',
+    description: ''
+  };
 
   newUser: NewUserRequest = {
     username: '',
@@ -188,8 +321,27 @@ export class UserManagementComponent implements OnInit {
 
   constructor(private userService: UserManagementService) {}
 
+  createSector(): void {
+    this.sectorMessage = '';
+    this.sectorError = false;
+
+    this.userService.createSector(this.newSector).subscribe({
+      next: (sector) => {
+        this.sectorMessage = 'Sector created successfully';
+        this.newSector = { name: '', description: '' };
+        this.loadSectors();
+      },
+      error: (error) => {
+        console.error('Failed to create sector:', error);
+        this.sectorMessage = 'Failed to create sector';
+        this.sectorError = true;
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.loadSectors();
+    this.loadAllUsers();
   }
 
   loadSectors(): void {
@@ -206,6 +358,36 @@ export class UserManagementComponent implements OnInit {
         this.message = 'Failed to load sectors';
         this.error = true;
       }
+    });
+  }
+
+  loadAllUsers(): void {
+    this.userService.getAllUsers().subscribe({
+      next: (users) => {
+        this.allUsers = users;
+        this.filteredUsers = users;
+      },
+      error: (error) => {
+        console.error('Failed to load all users:', error);
+        this.message = 'Failed to load users';
+        this.error = true;
+      }
+    });
+  }
+
+  filterUsers(): void {
+    this.filteredUsers = this.allUsers.filter(user => {
+      // Filter by search term
+      const searchMatch = !this.searchTerm || 
+        user.username.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        (user.firstName && user.firstName.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+        (user.lastName && user.lastName.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+        (user.email && user.email.toLowerCase().includes(this.searchTerm.toLowerCase()));
+      
+      // Filter by role
+      const roleMatch = !this.roleFilter || user.roles.includes(this.roleFilter);
+      
+      return searchMatch && roleMatch;
     });
   }
 
@@ -245,8 +427,9 @@ export class UserManagementComponent implements OnInit {
           role: 'student',
           sector_ids: []
         };
-        // Refresh user list if we're viewing the sector the new user was added to
-        if (this.selectedSector && this.newUser.sector_ids.includes(this.selectedSector.id || '')) {
+        // Refresh user lists
+        this.loadAllUsers();
+        if (this.selectedSector) {
           this.loadSectorUsers(this.selectedSector.id || '');
         }
       },
@@ -254,6 +437,36 @@ export class UserManagementComponent implements OnInit {
         console.error('Failed to create user:', error);
         this.message = error.error?.detail || 'Failed to create user';
         this.error = true;
+      }
+    });
+  }
+
+  confirmDeleteUser(user: KeycloakUser): void {
+    this.userToDelete = user;
+    this.showDeleteModal = true;
+  }
+
+  deleteUser(): void {
+    if (!this.userToDelete) return;
+    
+    this.userService.deleteUser(this.userToDelete.id).subscribe({
+      next: () => {
+        this.message = `User ${this.userToDelete?.username} deleted successfully`;
+        this.error = false;
+        this.showDeleteModal = false;
+        this.userToDelete = null;
+        
+        // Refresh user lists
+        this.loadAllUsers();
+        if (this.selectedSector) {
+          this.loadSectorUsers(this.selectedSector.id || '');
+        }
+      },
+      error: (error) => {
+        console.error('Failed to delete user:', error);
+        this.message = error.error?.detail || 'Failed to delete user';
+        this.error = true;
+        this.showDeleteModal = false;
       }
     });
   }

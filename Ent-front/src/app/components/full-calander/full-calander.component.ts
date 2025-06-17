@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -8,6 +9,8 @@ import { CommonModule } from '@angular/common';
 import { CalendarService, CalendarEvent } from '../../services/calendar.service';
 import { FormsModule } from '@angular/forms';
 import { AuthNewService } from '../../services/auth-new.service';
+import { SectorService } from '../../services/sector.service';
+import { UserManagementService, UserSectorInfo, Sector } from '../../services/user-management.service';
 
 @Component({
   selector: 'app-calendar',
@@ -24,7 +27,17 @@ import { AuthNewService } from '../../services/auth-new.service';
           <div>
             <label>Title:</label>
             <input [(ngModel)]="newEvent.title" name="title" required>
-          </div>          <div>
+          </div>
+          <div>
+            <label>Sector:</label>
+            <select [(ngModel)]="newEvent.filier_id" name="filier_id" required>
+              <option value="">Select a sector</option>
+              <option *ngFor="let sector of sectors" [value]="sector.id">
+                {{ sector.name }}
+              </option>
+            </select>
+          </div>
+          <div>
             <label>Start:</label>
             <input type="datetime-local" 
                    [ngModel]="newEvent.start | date:'yyyy-MM-ddTHH:mm'" 
@@ -42,12 +55,8 @@ import { AuthNewService } from '../../services/auth-new.service';
             <label>Color:</label>
             <input type="color" [(ngModel)]="newEvent.color" name="color" required>
           </div>
-          <div>
-            <label>Filière ID:</label>
-            <input [(ngModel)]="newEvent.filier_id" name="filier_id" required>
-          </div>
           <button type="submit">Save</button>
-          <button type="button" (click)="showEventForm = false">Cancel</button>
+          <button type="button" (click)="cancelEventForm()">Cancel</button>
         </form>
       </div>
       <full-calendar 
@@ -97,7 +106,7 @@ import { AuthNewService } from '../../services/auth-new.service';
       display: block;
       margin-bottom: 5px;
     }
-    .event-form input {
+    .event-form input, .event-form select {
       width: 100%;
       padding: 8px;
       border: 1px solid #ddd;
@@ -119,7 +128,10 @@ import { AuthNewService } from '../../services/auth-new.service';
 })
 export class FullCalanderComponent implements OnInit {
   showEventForm = false;
-  isTeacher = false;  newEvent: Partial<CalendarEvent> = {
+  isTeacher = false;
+  sectors: any[] = [];
+  
+  newEvent: Partial<CalendarEvent> = {
     title: '',
     start: new Date(),
     end: new Date(Date.now() + 3600000), // Current time + 1 hour
@@ -142,14 +154,18 @@ export class FullCalanderComponent implements OnInit {
     dayMaxEvents: true,
     events: this.fetchEvents.bind(this)
   };
-
   constructor(
     private calendarService: CalendarService,
-    private authService: AuthNewService
+    private authService: AuthNewService,
+    private sectorService: SectorService,
+    private userManagementService: UserManagementService
   ) {}
 
   async ngOnInit(): Promise<void> {
     await this.checkTeacherRole();
+    if (this.isTeacher) {
+      this.loadSectors();
+    }
   }
 
   private async checkTeacherRole() {
@@ -157,34 +173,109 @@ export class FullCalanderComponent implements OnInit {
     console.log('Is user teacher:', this.isTeacher);
   }
 
+  private loadSectors() {
+    this.sectorService.getSectors().subscribe({
+      next: (sectors) => {
+        this.sectors = sectors;
+      },
+      error: (error) => {
+        console.error('Failed to load sectors:', error);
+      }
+    });
+  }
+
   showAddEventForm() {
     if (this.isTeacher) {
       this.showEventForm = true;
       // Initialize with current date
       const now = new Date();
-      this.newEvent.start = now.toISOString().slice(0, 16);
-      this.newEvent.end = new Date(now.getTime() + 60 * 60 * 1000).toISOString().slice(0, 16);
+      this.newEvent = {
+        title: '',
+        start: now.toISOString().slice(0, 16),
+        end: new Date(now.getTime() + 60 * 60 * 1000).toISOString().slice(0, 16),
+        color: '#4CAF50',
+        filier_id: ''
+      };
     }
+  }
+
+  cancelEventForm() {
+    this.showEventForm = false;
+    this.newEvent = {
+      title: '',
+      start: new Date(),
+      end: new Date(Date.now() + 3600000),
+      color: '#4CAF50',
+      filier_id: ''
+    };
   }
   fetchEvents(info: { start: Date; end: Date; timeZone: string }, 
               successCallback: (events: EventInput[]) => void,
               failureCallback: (error: Error) => void) {
-    // Get events for filier_id '0' (all events)
-    this.calendarService.getEventsByFilierId('1').subscribe({
-      next: (events) => {
-        const formattedEvents = events.map(event => ({
-          id: event.id,
-          title: event.title,
-          start: event.start instanceof Date ? event.start : new Date(event.start),
-          end: event.end instanceof Date ? event.end : new Date(event.end),
-          color: event.color,
-          filier_id: event.filier_id
-        }));
-        successCallback(formattedEvents);
+    const currentUser = this.authService.currentUser;
+    if (!currentUser) {
+      failureCallback(new Error('No user logged in'));
+      return;
+    }
+
+    // First get user's sectors
+    this.userManagementService.getUserSectors(currentUser.id).subscribe({
+      next: (userSectorInfo: UserSectorInfo) => {
+        if (userSectorInfo.sectors.length === 0) {
+          successCallback([]); // No sectors, no events
+          return;
+        }
+
+        // If user is a teacher, they can see events from all their sectors
+        if (this.isTeacher) {
+          // Create an array of observables for each sector
+          const eventObservables = userSectorInfo.sectors.map((sector: Sector) => 
+            this.calendarService.getEventsByFilierId(sector.id || '')
+          );
+
+          // Fetch events from all sectors
+          Promise.all(eventObservables.map((obs: Observable<CalendarEvent[]>) => 
+            new Promise<CalendarEvent[]>(resolve => obs.subscribe((events: CalendarEvent[]) => resolve(events)))
+          )).then(sectorEvents => {
+            // Combine all events
+            const allEvents = sectorEvents.flat().map(event => ({
+              id: event.id,
+              title: event.title,
+              start: event.start instanceof Date ? event.start : new Date(event.start),
+              end: event.end instanceof Date ? event.end : new Date(event.end),
+              color: event.color,
+              filier_id: event.filier_id
+            }));
+            successCallback(allEvents);
+          }).catch(error => {
+            console.error('Failed to fetch events:', error);
+            failureCallback(error);
+          });
+        } else {
+          // For students, just show events from their primary sector
+          const primarySector = userSectorInfo.sectors[0];
+          this.calendarService.getEventsByFilierId(primarySector.id || '').subscribe({
+            next: (events) => {
+              const formattedEvents = events.map(event => ({
+                id: event.id,
+                title: event.title,
+                start: event.start instanceof Date ? event.start : new Date(event.start),
+                end: event.end instanceof Date ? event.end : new Date(event.end),
+                color: event.color,
+                filier_id: event.filier_id
+              }));
+              successCallback(formattedEvents);
+            },
+            error: (error) => {
+              console.error('Failed to fetch events:', error);
+              failureCallback(new Error('Failed to load events'));
+            }
+          });
+        }
       },
       error: (error) => {
-        console.error('Failed to fetch events:', error);
-        failureCallback(new Error('Failed to load events'));
+        console.error('Failed to fetch user sectors:', error);
+        failureCallback(new Error('Failed to load user sectors'));
       }
     });
   }
@@ -203,29 +294,28 @@ export class FullCalanderComponent implements OnInit {
 
   createEvent(event: Event) {
     event.preventDefault();
-    if (this.newEvent.title && this.newEvent.start && this.newEvent.end && this.newEvent.filier_id) {
-      this.calendarService.createEvent(this.newEvent as CalendarEvent).subscribe({
-        next: (createdEvent) => {
-          console.log('Event created:', createdEvent);
-          this.showEventForm = false;
-          // Reset form
-          this.newEvent = {
-            title: '',
-            start: '',
-            end: '',
-            color: '#4CAF50',
-            filier_id: ''
-          };
-          // Refresh calendar
-          const calendarApi = (document.querySelector('full-calendar') as any)?.getApi();
-          if (calendarApi) {
-            calendarApi.refetchEvents();
-          }
-        },
-        error: (error) => {
-          console.error('Failed to create event:', error);
-        }
-      });
+    if (!this.newEvent.title || !this.newEvent.start || !this.newEvent.end || !this.newEvent.filier_id) {
+      console.error('Please fill in all required fields');
+      return;
     }
+
+    this.calendarService.createEvent({
+      title: this.newEvent.title,
+      start: new Date(this.newEvent.start),
+      end: new Date(this.newEvent.end),
+      color: this.newEvent.color,
+      filier_id: this.newEvent.filier_id
+    }).subscribe({
+      next: () => {
+        this.showEventForm = false;
+        // Reset form
+        this.cancelEventForm();
+        // Refresh calendar events
+        this.calendarOptions.events = this.fetchEvents.bind(this);
+      },
+      error: (error) => {
+        console.error('Failed to create event:', error);
+      }
+    });
   }
 }

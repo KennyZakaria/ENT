@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthNewService } from '../../services/auth-new.service';
 import { CalendarService, CalendarEvent } from '../../services/calendar.service';
 import { UserManagementService, Sector } from '../../services/user-management.service';
+import { SectorService } from '../../services/sector.service';
 
 @Component({
   selector: 'app-calendar',
@@ -18,11 +19,22 @@ export class CalendarComponent implements OnInit {
   error: string | null = null;
   selectedFilierId: string = '';
   userSectors: Sector[] = [];
+  showNewEventForm = false;
+  
+  newEvent = {
+    title: '',
+    start: '',
+    end: '',
+    sectorId: '',
+    description: '',
+    color: '#3788d8'
+  };
 
   constructor(
     public authService: AuthNewService,
     private calendarService: CalendarService,
-    private userManagementService: UserManagementService
+    private userManagementService: UserManagementService,
+    private sectorService: SectorService
   ) {}
 
   ngOnInit() {
@@ -87,5 +99,67 @@ export class CalendarComponent implements OnInit {
 
   refreshEvents() {
     this.loadCalendarEvents();
+  }
+
+  toggleNewEventForm() {
+    this.showNewEventForm = !this.showNewEventForm;
+    if (this.showNewEventForm && this.userSectors.length === 0) {
+      this.loadAllSectors();
+    }
+  }
+
+  private loadAllSectors() {
+    this.loading = true;
+    this.sectorService.getSectors().subscribe({
+      next: (sectors) => {
+        this.userSectors = sectors;
+        if (this.userSectors.length > 0 && !this.newEvent.sectorId) {
+          this.newEvent.sectorId = this.userSectors[0].id || '';
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading sectors:', error);
+        this.error = 'Failed to load sectors. Please try again later.';
+        this.loading = false;
+      }
+    });
+  }
+
+  createNewEvent() {
+    if (!this.newEvent.title || !this.newEvent.start || !this.newEvent.end || !this.newEvent.sectorId) {
+      this.error = 'Please fill in all required fields';
+      return;
+    }
+
+    this.loading = true;
+    this.calendarService.createEvent({
+      ...this.newEvent,
+      start: new Date(this.newEvent.start).toISOString(),
+      end: new Date(this.newEvent.end).toISOString()
+    }).subscribe({
+      next: () => {
+        this.loading = false;
+        this.showNewEventForm = false;
+        this.resetNewEventForm();
+        this.loadCalendarEvents();
+      },
+      error: (error) => {
+        console.error('Error creating event:', error);
+        this.error = 'Failed to create event. Please try again later.';
+        this.loading = false;
+      }
+    });
+  }
+
+  resetNewEventForm() {
+    this.newEvent = {
+      title: '',
+      start: '',
+      end: '',
+      sectorId: this.userSectors.length > 0 ? (this.userSectors[0].id || '') : '',
+      description: '',
+      color: '#3788d8'
+    };
   }
 }

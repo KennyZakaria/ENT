@@ -63,6 +63,7 @@
       <div class="message" *ngFor="let message of messages"
            [class.own-message]="message.sender_id === currentUserId">
         <div class="message-content">
+          <div class="sender-name" *ngIf="message.sender_id !== currentUserId">{{ getSenderName(message.sender_id) }}</div>
           <div class="message-text">{{ message.content }}</div>
           <div class="message-meta">
             <span class="timestamp">{{ formatTimestamp(message.timestamp) }}</span>

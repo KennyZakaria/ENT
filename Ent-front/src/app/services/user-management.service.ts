@@ -37,6 +37,10 @@ export class UserManagementService {
     return this.http.post<KeycloakUser>(`${this.baseUrl}/users/`, user);
   }
 
+  deleteUser(userId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/users/${userId}`);
+  }
+
   listSectors(): Observable<Sector[]> {
     return this.http.get<Sector[]>(`${this.baseUrl}/sectors/`);
   }

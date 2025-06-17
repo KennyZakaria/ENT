@@ -13,7 +13,7 @@ export interface Sector {
   providedIn: 'root'
 })
 export class SectorService {
-  private baseUrl = `${environment.uploadApiUrl}/sectors`;
+  private baseUrl = `${environment.authApiUrl}/sectors`;
 
   constructor(private http: HttpClient) {}
 
