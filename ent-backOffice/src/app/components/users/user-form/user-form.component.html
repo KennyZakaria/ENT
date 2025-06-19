@@ -1,58 +1,111 @@
-<div class="dashboard-card">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title><mat-icon>person_add</mat-icon> Create New User</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="modern-form">
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Username</mat-label>
-            <input matInput formControlName="username" required>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" required>
-          </mat-form-field>
+<div class="max-w-3xl mx-auto p-8 bg-gray-50 min-h-screen">
+  <div class="bg-white shadow-xl rounded-2xl p-8 space-y-6">
+    <div class="flex items-center gap-3 mb-6">
+      <!-- <mat-icon class="text-blue-600">person_add</mat-icon> -->
+      <h1 class="text-2xl font-bold text-gray-800">Create New User</h1>
+    </div>
+
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <input 
+            id="username"
+            type="text"
+            formControlName="username"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-gray-50"
+          />
         </div>
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password" required>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>First Name</mat-label>
-            <input matInput formControlName="first_name" required>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Last Name</mat-label>
-            <input matInput formControlName="last_name" required>
-          </mat-form-field>
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input 
+            id="email"
+            type="email"
+            formControlName="email"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-gray-50"
+          />
         </div>
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Role</mat-label>
-            <mat-select formControlName="role" required>
-              <mat-option value="teacher">Teacher</mat-option>
-              <mat-option value="student">Student</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Sectors</mat-label>
-            <mat-select formControlName="sector_ids" multiple required>
-              <mat-option *ngFor="let sector of sectors" [value]="sector.id">
-                {{sector.name}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input 
+            id="password"
+            type="password"
+            formControlName="password"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-gray-50"
+          />
         </div>
-        <div class="button-row">
-          <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="userForm.invalid">
-            Create User
-          </button>
+        <div>
+          <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+          <input 
+            id="first_name"
+            type="text"
+            formControlName="first_name"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-gray-50"
+          />
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+        <div>
+          <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+          <input 
+            id="last_name"
+            type="text"
+            formControlName="last_name"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-gray-50"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+          <select 
+            id="role"
+            formControlName="role"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-gray-50"
+          >
+            <option value="">Select a role</option>
+            <option value="teacher">Teacher</option>
+            <option value="student">Student</option>
+          </select>
+        </div>
+        <div>
+          <label for="sector_ids" class="block text-sm font-medium text-gray-700 mb-1">Sectors</label>
+          <select 
+            id="sector_ids"
+            formControlName="sector_ids"
+            multiple
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-gray-50"
+          >
+            <option *ngFor="let sector of sectors" [value]="sector.id">{{sector.name}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-4 pt-4">
+        <button 
+          type="button" 
+          (click)="cancel()"
+          class="px-6 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all text-gray-700 font-medium"
+        >
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          [disabled]="userForm.invalid"
+          class="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Create User
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

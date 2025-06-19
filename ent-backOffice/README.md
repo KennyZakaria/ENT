@@ -20,7 +20,7 @@ This application can be run using Docker, which simplifies setup and ensures con
    docker-compose up -d
    ```
 
-   This will build the Docker image and start the container in detached mode. The application will be available at http://localhost:4200.
+   This will build the Docker image and start the container in detached mode. The application will be available at http://localhost:5200.
 
 2. **Using Docker directly**
 
@@ -29,10 +29,10 @@ This application can be run using Docker, which simplifies setup and ensures con
    docker build -t ent-backoffice .
 
    # Run the container
-   docker run -p 4200:80 -d --name ent-backoffice ent-backoffice
+   docker run -p 5200:80 -d --name ent-backoffice ent-backoffice
    ```
 
-   The application will be available at http://localhost:4200.
+   The application will be available at http://localhost:5200.
 
 ### Stopping the Application
 
@@ -58,7 +58,7 @@ npm install
 npm start
 ```
 
-The application will be available at http://localhost:4200.
+The application will be available at http://localhost:5200.
 
 ## Building for Production
 

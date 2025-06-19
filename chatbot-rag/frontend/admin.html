@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration RAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .provider-card {
+            transition: all 0.3s ease;
+        }
+    
+        .provider-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        .provider-card.selected-together {
+            border-color: #3B82F6 !important;
+            background-color: #EFF6FF !important;
+        }
+    
+        .provider-card.selected-ollama {
+            border-color: #10B981 !important;
+            background-color: #F0FDF4 !important;
+        }
+    
+        .apply-button-ready {
+            background-color: #059669 !important;
+        }
+    
+        .apply-button-ready:hover {
+            background-color: #047857 !important;
+        }</style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Administration RAG</h1>
+
+        <!-- Navigation par onglets -->
+        <div class="bg-white rounded-lg shadow-sm mb-6">
+            <div class="border-b border-gray-200">
+                <nav class="flex space-x-8 px-6">
+                    <button id="tab-documents"
+                        class="tab-button py-4 px-2 font-medium text-sm transition-colors border-b-2 border-blue-500 text-blue-600">
+                        📄 Documents
+                    </button>
+                    <button id="tab-llm"
+                        class="tab-button py-4 px-2 font-medium text-sm transition-colors text-gray-500 hover:text-gray-700">
+                        🤖 Configuration LLM
+                    </button>
+                    <button id="tab-settings"
+                        class="tab-button py-4 px-2 font-medium text-sm transition-colors text-gray-500 hover:text-gray-700">
+                        ⚙️ Paramètres
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Contenu Documents -->
+        <div id="content-documents" class="tab-content">
+            <!-- Upload Section -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h2 class="text-xl font-semibold mb-4">Ajouter un document</h2>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <input type="file" id="fileInput" accept=".pdf,.txt,.md,.docx"
+                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Télécharger et traiter
+                    </button>
+                </form>
+                <div id="uploadProgress" class="mt-4 hidden">
+                    <div class="bg-gray-200 rounded-full h-2">
+                        <div id="progressBar" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="progressText" class="text-sm text-gray-600 mt-2">Traitement en cours...</p>
+                </div>
+            </div>
+
+            <!-- Documents List -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4">Documents existants</h2>
+                <div id="documentsList">
+                    <p class="text-gray-500">Chargement...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu Configuration LLM -->
+        <div id="content-llm" class="tab-content hidden">
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Configuration LLM</h3>
+
+                <!-- Statut actuel -->
+                <div id="llm-status" class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-gray-700">Provider actuel:</p>
+                            <p id="current-provider" class="text-xl font-bold text-blue-600 capitalize">
+                                Chargement...
+                            </p>
+                            <p id="current-model" class="text-sm text-gray-600">Modèle: Chargement...</p>
+                        </div>
+                        <div id="llm-ready-status"
+                            class="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                            ⏳ Vérification...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sélecteur de provider -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Choisir le provider LLM:
+                        </label>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <!-- Together AI Card -->
+                            <div id="card-together"
+                                class="provider-card border-2 rounded-lg p-4 cursor-pointer transition-all border-gray-200 hover:border-gray-300">
+                                <div class="flex items-center">
+                                    <input type="radio" id="provider-together" name="provider" value="together_ai"
+                                        class="mr-3">
+                                    <div>
+                                        <label for="provider-together" class="font-medium cursor-pointer">
+                                            Together AI (Cloud)
+                                        </label>
+                                        <p class="text-sm text-gray-600">
+                                            API externe - Rapide et puissant
+                                        </p>
+                                        <div id="together-status" class="text-sm mt-1 text-gray-600">
+                                            ⏳ Vérification...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ollama Card -->
+                            <div id="card-ollama"
+                                class="provider-card border-2 rounded-lg p-4 cursor-pointer transition-all border-gray-200 hover:border-gray-300">
+                                <div class="flex items-center">
+                                    <input type="radio" id="provider-ollama" name="provider" value="ollama"
+                                        class="mr-3">
+                                    <div>
+                                        <label for="provider-ollama" class="font-medium cursor-pointer">
+                                            Ollama (Local)
+                                        </label>
+                                        <p class="text-sm text-gray-600">
+                                            Hébergé localement - Privé et gratuit
+                                        </p>
+                                        <div id="ollama-status" class="text-sm mt-1 text-gray-600">
+                                            ⏳ Vérification...
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sélecteur de modèle Ollama -->
+                        <div id="ollama-model-selector" class="hidden mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Modèle Ollama:
+                            </label>
+                            <select id="ollama-model-select"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Chargement des modèles...</option>
+                            </select>
+                        </div>
+
+                        <!-- Bouton d'application -->
+                        <button id="apply-llm-config"
+                            class="w-full py-3 px-4 rounded-lg font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            disabled>
+                            Appliquer la configuration
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Zone de debug -->
+                <details class="mt-4">
+                    <summary class="cursor-pointer text-sm text-gray-600">Debug Info</summary>
+                    <pre id="debug-info" class="mt-2 p-3 bg-gray-100 rounded text-xs overflow-auto">
+                        Chargement...
+                    </pre>
+                </details>
+            </div>
+        </div>
+
+        <!-- Contenu Paramètres -->
+        <div id="content-settings" class="tab-content hidden">
+            <div class="bg-white rounded-lg p-6 shadow-sm">
+                <h3 class="text-lg font-semibold mb-4">Paramètres généraux</h3>
+                <p class="text-gray-600">À implémenter...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

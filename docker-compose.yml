@@ -1,0 +1,250 @@
+version: '3.8'
+
+services:
+  # Base services from ent-v2
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - ent-network
+
+  cassandra:
+    image: cassandra:4.0
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=course_cluster
+      - CASSANDRA_ENDPOINT_SNITCH=SimpleSnitch
+      - CASSANDRA_DC=datacenter1
+    healthcheck:
+      test: ["CMD", "cqlsh", "-u", "cassandra", "-p", "cassandra", "-e", "describe keyspaces"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ent-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.1.1
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    command: start-dev
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    restart: unless-stopped
+    networks:
+      - ent-network
+
+  # ent-v2 services
+  file-upload-service:
+    build: ./ent-v2
+    ports:
+      - "8000:8000"
+    environment:
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_SECURE=False
+      - MINIO_BUCKET_NAME=courses
+      - MINIO_PUBLIC_URL=http://localhost:9000
+      - CASSANDRA_CONTACT_POINTS=cassandra
+      - CASSANDRA_PORT=9042
+      - CASSANDRA_USERNAME=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=master
+      - KEYCLOAK_CLIENT_ID=file-upload-service
+      - MAX_FILE_SIZE=104857600
+      - ALLOWED_FILE_TYPES=pdf,doc,docx,ppt,pptx,txt,mp4
+    depends_on:
+      - minio
+      - cassandra
+      - keycloak
+    volumes:
+      - ./ent-v2/app:/app/app
+    restart: unless-stopped
+    networks:
+      - ent-network
+
+  # ent-v3 services
+  download-service:
+    build: ./ent-v3/download-service
+    ports:
+      - "8001:8001"
+    environment:
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_SECURE=False
+      - MINIO_BUCKET_NAME=courses
+      - MINIO_PUBLIC_URL=http://localhost:9000
+      - CASSANDRA_CONTACT_POINTS=cassandra
+      - CASSANDRA_PORT=9042
+      - CASSANDRA_USERNAME=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=master
+      - KEYCLOAK_CLIENT_ID=file-upload-service
+      - PRESIGNED_URL_EXPIRY=3600
+    depends_on:
+      - minio
+      - cassandra
+      - keycloak
+    volumes:
+      - ./ent-v3/download-service/app:/app/app
+    restart: unless-stopped
+    networks:
+      - ent-network
+
+  # ent-v4 services
+  calender-service:
+    build: ./ent-v4/calender-service
+    ports:
+      - "8002:8002"
+    environment:
+      - CASSANDRA_CONTACT_POINTS=cassandra
+      - CASSANDRA_PORT=9042
+      - CASSANDRA_USERNAME=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=master
+      - KEYCLOAK_CLIENT_ID=file-upload-service
+      - PRESIGNED_URL_EXPIRY=3600
+    depends_on:
+      - cassandra
+      - keycloak
+    volumes:
+      - ./ent-v4/calender-service/app:/app/app
+    restart: unless-stopped
+    networks:
+      - ent-network
+
+  # ent-v5 services
+  users-service:
+    build: ./ent-v5/users-service
+    ports:
+      - "8003:8003"
+    environment:
+      - CASSANDRA_CONTACT_POINTS=cassandra
+      - CASSANDRA_PORT=9042
+      - CASSANDRA_USERNAME=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=master
+      - KEYCLOAK_CLIENT_ID=file-upload-service
+      - PRESIGNED_URL_EXPIRY=3600
+    depends_on:
+      - cassandra
+      - keycloak
+    volumes:
+      - ./ent-v5/users-service/app:/app/app
+    restart: unless-stopped
+    networks:
+      - ent-network
+
+  # ent-v6 services
+  chat-service:
+    build: ./ent-v6/chat-service
+    ports:
+      - "8004:8004"
+    environment:
+      - CASSANDRA_CONTACT_POINTS=cassandra
+      - CASSANDRA_PORT=9042
+      - CASSANDRA_USERNAME=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=master
+      - KEYCLOAK_CLIENT_ID=file-upload-service
+      - USER_MANAGEMENT_URL=http://users-service:8003
+    depends_on:
+      - cassandra
+      - keycloak
+      - users-service
+    volumes:
+      - ./ent-v6/chat-service/app:/app/app
+    restart: unless-stopped
+    networks:
+      - ent-network
+
+  # chatbot-rag services
+  chatbot-backend:
+    build: ./chatbot-rag/backend
+    ports:
+      - "2001:2001"
+    volumes:
+      - ./chatbot-rag/backend:/app
+      - ./chatbot-rag/backend/data:/app/data
+      - ./chatbot-rag/frontend:/app/frontend
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=llama3
+    networks:
+      - ent-network
+
+  chatbot-frontend:
+    build: ./chatbot-rag/frontend
+    ports:
+      - "2000:2000"
+    depends_on:
+      - chatbot-backend
+    volumes:
+      - ./chatbot-rag/frontend:/usr/share/nginx/html
+    networks:
+      - ent-network
+
+  # Ent-front services
+  ent-frontend:
+    build:
+      context: ./Ent-front
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - ent-network
+
+  # ent-backOffice services
+  ent-backoffice:
+    build:
+      context: ./ent-backOffice
+      dockerfile: Dockerfile
+    ports:
+      - "5200:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - ent-network
+
+volumes:
+  minio-data:
+  cassandra-data:
+  keycloak-data:
+
+networks:
+  ent-network:
+    driver: bridge

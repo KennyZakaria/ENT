@@ -1,1 +1,42 @@
-<p>sector-list works!</p>
+<div class="max-w-7xl mx-auto p-8 bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Sectors</h1>
+    <div class="flex items-center gap-4">
+      <!-- Add Sector Button -->
+      <button (click)="createSector()"
+              class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold px-6 py-2 rounded-xl shadow-md transition-all duration-300 hover:-translate-y-1">
+        ➕ New Sector
+      </button>
+    </div>
+  </div>
+
+  <!-- Sectors Table -->
+  <div class="overflow-x-auto rounded-xl shadow-md">
+    <table class="min-w-full bg-white divide-y divide-gray-200 text-sm text-left">
+      <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+        <tr>
+          <th class="px-6 py-3">Name</th>
+          <th class="px-6 py-3">Description</th>
+          <th class="px-6 py-3 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <tr *ngFor="let sector of sectors" class="hover:bg-gray-50 transition">
+          <td class="px-6 py-4 font-medium text-gray-800">{{ sector.name }}</td>
+          <td class="px-6 py-4 text-gray-600">{{ sector.description }}</td>
+          <td class="px-6 py-4 text-right">
+            <button (click)="viewUsers(sector)"
+                    class="text-blue-600 hover:text-blue-800 transition transform hover:scale-110 mr-3">
+              👥
+            </button>
+            <button 
+                    class="text-red-600 hover:text-red-800 transition transform hover:scale-110">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

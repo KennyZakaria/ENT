@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "2001:2001"
+    volumes:
+      - ./backend:/app
+      - ./backend/data:/app/data
+      - ./frontend:/app/frontend
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=llama3
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "2000:2000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/usr/share/nginx/html

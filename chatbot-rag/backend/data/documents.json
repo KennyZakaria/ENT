@@ -1,0 +1,16 @@
+[
+  {
+    "id": "d4f42048-01ed-4ed1-8b64-2bb9d49f9be3",
+    "filename": "BD_texte_normal_fr.txt",
+    "file_size": 2833689,
+    "ingested_at": "2025-06-17 14:21:39.665176",
+    "chunk_count": 2827
+  },
+  {
+    "id": "7dadf560-a377-4a5f-b601-31d4c1b85672",
+    "filename": "Securit\u00e9 des applications.pdf",
+    "file_size": 3353213,
+    "ingested_at": "2025-06-18 12:37:01.596674",
+    "chunk_count": 23
+  }
+]
