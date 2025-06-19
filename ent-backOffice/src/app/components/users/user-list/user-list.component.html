@@ -1,1 +1,53 @@
-<p>user-list works!</p>
+<div class="max-w-7xl mx-auto p-8 bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Users</h1>
+    <div class="flex items-center gap-4">
+      <!-- Role Filter -->
+      <div>
+        <label for="role" class="block text-sm font-semibold text-gray-700 mb-1">Filter by Role</label>
+        <select id="role" [(ngModel)]="selectedRole" (change)="loadUsers()"
+                class="px-4 py-2 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">All</option>
+          <option value="teacher">Teachers</option>
+          <option value="student">Students</option>
+        </select>
+      </div>
+
+      <!-- Add User Button -->
+      <button (click)="createUser()"
+              class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold px-6 py-2 rounded-xl shadow-md transition-all duration-300 hover:-translate-y-1">
+        ➕ New User
+      </button>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="overflow-x-auto rounded-xl shadow-md">
+    <table class="min-w-full bg-white divide-y divide-gray-200 text-sm text-left">
+      <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+        <tr>
+          <th class="px-6 py-3">Username</th>
+          <th class="px-6 py-3">Email</th>
+          <th class="px-6 py-3">Name</th>
+          <th class="px-6 py-3">Roles</th>
+          <th class="px-6 py-3 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <tr *ngFor="let user of users" class="hover:bg-gray-50 transition">
+          <td class="px-6 py-4 font-medium text-gray-800">{{ user.username }}</td>
+          <td class="px-6 py-4 text-gray-600">{{ user.email }}</td>
+          <td class="px-6 py-4 text-gray-600">{{ user.firstName }} {{ user.lastName }}</td>
+          <td class="px-6 py-4 text-gray-600">{{ user.roles?.join(', ') }}</td>
+          <td class="px-6 py-4 text-right">
+            <button (click)="deleteUser(user)"
+                    class="text-red-600 hover:text-red-800 transition transform hover:scale-110">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

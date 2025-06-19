@@ -22,61 +22,62 @@ import { KeycloakUser } from '../../../models/user.model';
     MatFormFieldModule,
     FormsModule
   ],
-  template: `
-    <div class="container">
-      <div class="header">
-        <h1>Users</h1>
-        <div class="actions">
-          <mat-form-field>
-            <mat-label>Filter by Role</mat-label>
-            <mat-select [(ngModel)]="selectedRole" (selectionChange)="loadUsers()">
-              <mat-option [value]="''">All</mat-option>
-              <mat-option value="teacher">Teachers</mat-option>
-              <mat-option value="student">Students</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <button mat-raised-button color="primary" (click)="createUser()">
-            <mat-icon>add</mat-icon>
-            New User
-          </button>
-        </div>
-      </div>
+  // template: `
+  //   <div class="container">
+  //     <div class="header">
+  //       <h1>Users</h1>
+  //       <div class="actions">
+  //         <mat-form-field>
+  //           <mat-label>Filter by Role</mat-label>
+  //           <mat-select [(ngModel)]="selectedRole" (selectionChange)="loadUsers()">
+  //             <mat-option [value]="''">All</mat-option>
+  //             <mat-option value="teacher">Teachers</mat-option>
+  //             <mat-option value="student">Students</mat-option>
+  //           </mat-select>
+  //         </mat-form-field>
+  //         <button mat-raised-button color="primary" (click)="createUser()">
+  //           <mat-icon>add</mat-icon>
+  //           New User
+  //         </button>
+  //       </div>
+  //     </div>
 
-      <table mat-table [dataSource]="users" class="mat-elevation-z8">
-        <ng-container matColumnDef="username">
-          <th mat-header-cell *matHeaderCellDef>Username</th>
-          <td mat-cell *matCellDef="let user">{{user.username}}</td>
-        </ng-container>
+  //     <table mat-table [dataSource]="users" class="mat-elevation-z8">
+  //       <ng-container matColumnDef="username">
+  //         <th mat-header-cell *matHeaderCellDef>Username</th>
+  //         <td mat-cell *matCellDef="let user">{{user.username}}</td>
+  //       </ng-container>
 
-        <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef>Email</th>
-          <td mat-cell *matCellDef="let user">{{user.email}}</td>
-        </ng-container>
+  //       <ng-container matColumnDef="email">
+  //         <th mat-header-cell *matHeaderCellDef>Email</th>
+  //         <td mat-cell *matCellDef="let user">{{user.email}}</td>
+  //       </ng-container>
 
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Name</th>
-          <td mat-cell *matCellDef="let user">{{user.firstName}} {{user.lastName}}</td>
-        </ng-container>
+  //       <ng-container matColumnDef="name">
+  //         <th mat-header-cell *matHeaderCellDef>Name</th>
+  //         <td mat-cell *matCellDef="let user">{{user.firstName}} {{user.lastName}}</td>
+  //       </ng-container>
 
-        <ng-container matColumnDef="roles">
-          <th mat-header-cell *matHeaderCellDef>Roles</th>
-          <td mat-cell *matCellDef="let user">{{user.roles?.join(', ')}}</td>
-        </ng-container>
+  //       <ng-container matColumnDef="roles">
+  //         <th mat-header-cell *matHeaderCellDef>Roles</th>
+  //         <td mat-cell *matCellDef="let user">{{user.roles?.join(', ')}}</td>
+  //       </ng-container>
 
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
-          <td mat-cell *matCellDef="let user">
-            <button mat-icon-button color="warn" (click)="deleteUser(user)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </ng-container>
+  //       <ng-container matColumnDef="actions">
+  //         <th mat-header-cell *matHeaderCellDef>Actions</th>
+  //         <td mat-cell *matCellDef="let user">
+  //           <button mat-icon-button color="warn" (click)="deleteUser(user)">
+  //             <mat-icon>delete</mat-icon>
+  //           </button>
+  //         </td>
+  //       </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-    </div>
-  `,
+  //       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  //       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  //     </table>
+  //   </div>
+  // `,
+  templateUrl: './user-list.component.html',
   styles: [`
     .container {
       padding: 20px;

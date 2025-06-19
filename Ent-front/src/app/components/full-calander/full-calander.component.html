@@ -1,5 +1,82 @@
-<full-calendar 
-  [options]="calendarOptions"
-  (eventClick)="handleEventClick($event)"
-  (dateClick)="handleDateClick($event)">
-</full-calendar>
+<div class="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-6 rounded-2xl shadow-xl mb-6 flex items-center justify-between">
+    <h1 class="text-3xl font-bold tracking-tight">📅 Calendar</h1>
+    <button *ngIf="isTeacher"
+            (click)="showAddEventForm()"
+            class="bg-white/20 hover:bg-white/30 backdrop-blur-sm border-2 border-white/30 hover:border-white/50 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      ➕ Add Event
+    </button>
+  </div>
+
+  <!-- Add Event Form -->
+  <div *ngIf="showEventForm && isTeacher" class="bg-white border border-gray-200 rounded-2xl shadow-xl p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-4">Add Event</h2>
+    <form (submit)="createEvent($event)" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Title -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Title</label>
+        <input [(ngModel)]="newEvent.title" name="title" required
+               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none transition bg-gray-50 focus:bg-white" />
+      </div>
+
+      <!-- Sector -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Sector</label>
+        <select [(ngModel)]="newEvent.filier_id" name="filier_id" required
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none transition bg-gray-50 focus:bg-white">
+          <option value="">Select a sector</option>
+          <option *ngFor="let sector of sectors" [value]="sector.id">{{ sector.name }}</option>
+        </select>
+      </div>
+
+      <!-- Start Date -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Start</label>
+        <input type="datetime-local"
+               [ngModel]="newEvent.start"
+               (ngModelChange)="newEvent.start = $event"
+               name="start" required
+               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none bg-gray-50 focus:bg-white transition" />
+      </div>
+
+      <!-- End Date -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">End</label>
+        <input type="datetime-local"
+               [ngModel]="newEvent.end"
+               (ngModelChange)="newEvent.end = $event"
+               name="end" required
+               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none bg-gray-50 focus:bg-white transition" />
+      </div>
+
+      <!-- Color -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Color</label>
+        <input type="color" [(ngModel)]="newEvent.color" name="color"
+               class="h-12 w-full px-2 border-2 border-gray-200 rounded-xl focus:outline-none" />
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-4 col-span-1 md:col-span-2 mt-4">
+        <button type="submit"
+                class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-semibold px-6 py-3 rounded-xl hover:shadow-lg hover:-translate-y-1 transition disabled:opacity-50">
+          💾 Save
+        </button>
+        <button type="button" (click)="cancelEventForm()"
+                class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-6 py-3 rounded-xl border border-gray-200">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Calendar -->
+  <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+    <full-calendar 
+      [options]="calendarOptions"
+      (eventClick)="handleEventClick($event)"
+      (dateClick)="handleDateClick($event)">
+    </full-calendar>
+  </div>
+</div>

@@ -16,56 +16,57 @@ import { UserManagementService, UserSectorInfo, Sector } from '../../services/us
   selector: 'app-calendar',
   standalone: true,
   imports: [CommonModule, FullCalendarModule, FormsModule],
-  template: `
-    <div class="calendar-container">
-      <div class="calendar-header" *ngIf="isTeacher">
-        <button class="add-event-btn" (click)="showAddEventForm()">Add Event</button>
-      </div>
-      <div class="event-form" *ngIf="showEventForm && isTeacher">
-        <h3>Add Event</h3>
-        <form (submit)="createEvent($event)">
-          <div>
-            <label>Title:</label>
-            <input [(ngModel)]="newEvent.title" name="title" required>
-          </div>
-          <div>
-            <label>Sector:</label>
-            <select [(ngModel)]="newEvent.filier_id" name="filier_id" required>
-              <option value="">Select a sector</option>
-              <option *ngFor="let sector of sectors" [value]="sector.id">
-                {{ sector.name }}
-              </option>
-            </select>
-          </div>
-          <div>
-            <label>Start:</label>
-            <input type="datetime-local" 
-                   [ngModel]="newEvent.start | date:'yyyy-MM-ddTHH:mm'" 
-                   (ngModelChange)="newEvent.start = $event"
-                   name="start" required>
-          </div>
-          <div>
-            <label>End:</label>
-            <input type="datetime-local" 
-                   [ngModel]="newEvent.end | date:'yyyy-MM-ddTHH:mm'" 
-                   (ngModelChange)="newEvent.end = $event"
-                   name="end" required>
-          </div>
-          <div>
-            <label>Color:</label>
-            <input type="color" [(ngModel)]="newEvent.color" name="color" required>
-          </div>
-          <button type="submit">Save</button>
-          <button type="button" (click)="cancelEventForm()">Cancel</button>
-        </form>
-      </div>
-      <full-calendar 
-        [options]="calendarOptions"
-        (eventClick)="handleEventClick($event)"
-        (dateClick)="handleDateClick($event)">
-      </full-calendar>
-    </div>
-  `,
+  // template: `
+  //   <div class="calendar-container">
+  //     <div class="calendar-header" *ngIf="isTeacher">
+  //       <button class="add-event-btn" (click)="showAddEventForm()">Add Event</button>
+  //     </div>
+  //     <div class="event-form" *ngIf="showEventForm && isTeacher">
+  //       <h3>Add Event</h3>
+  //       <form (submit)="createEvent($event)">
+  //         <div>
+  //           <label>Title:</label>
+  //           <input [(ngModel)]="newEvent.title" name="title" required>
+  //         </div>
+  //         <div>
+  //           <label>Sector:</label>
+  //           <select [(ngModel)]="newEvent.filier_id" name="filier_id" required>
+  //             <option value="">Select a sector</option>
+  //             <option *ngFor="let sector of sectors" [value]="sector.id">
+  //               {{ sector.name }}
+  //             </option>
+  //           </select>
+  //         </div>
+  //         <div>
+  //           <label>Start:</label>
+  //           <input type="datetime-local" 
+  //                  [ngModel]="newEvent.start | date:'yyyy-MM-ddTHH:mm'" 
+  //                  (ngModelChange)="newEvent.start = $event"
+  //                  name="start" required>
+  //         </div>
+  //         <div>
+  //           <label>End:</label>
+  //           <input type="datetime-local" 
+  //                  [ngModel]="newEvent.end | date:'yyyy-MM-ddTHH:mm'" 
+  //                  (ngModelChange)="newEvent.end = $event"
+  //                  name="end" required>
+  //         </div>
+  //         <div>
+  //           <label>Color:</label>
+  //           <input type="color" [(ngModel)]="newEvent.color" name="color" required>
+  //         </div>
+  //         <button type="submit">Save</button>
+  //         <button type="button" (click)="cancelEventForm()">Cancel</button>
+  //       </form>
+  //     </div>
+  //     <full-calendar 
+  //       [options]="calendarOptions"
+  //       (eventClick)="handleEventClick($event)"
+  //       (dateClick)="handleDateClick($event)">
+  //     </full-calendar>
+  //   </div>
+  // `,
+  templateUrl: './full-calander.component.html',
   styles: [`
     .calendar-container {
       padding: 20px;

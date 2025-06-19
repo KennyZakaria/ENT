@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  ent-backoffice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ent-backoffice
+    ports:
+      - "4200:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - ent-network
+
+networks:
+  ent-network:
+    driver: bridge

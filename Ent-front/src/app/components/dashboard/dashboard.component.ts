@@ -16,81 +16,55 @@ interface DashboardTile {
   standalone: true,
   imports: [CommonModule, RouterModule, DashboardTileComponent],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
   userInfo: any = null;
   isAdmin = false;
+  
   dashboardTiles: DashboardTile[] = [
     {
-      title: 'Messages',
-      iconPath: 'assets/icons/message.svg',
-      description: 'Access your university messaging system',
-      link: '/messaging'
-    },
-    {
-      title: 'Notes',
-      iconPath: 'assets/icons/notes.svg',
-      description: 'View and manage your course notes',
-      link: '/notes'
-    },
-    {
-      title: 'Exam Calendar',
+      title: 'Calendrier d\'Examens',
       iconPath: 'assets/icons/calendar.svg',
-      description: 'Check your upcoming exams and deadlines',
+      description: 'Consultez vos examens et échéances à venir',
       link: '/calendar'
     },
     {
-      title: 'Support Requests',
-      iconPath: 'assets/icons/support.svg',
-      description: 'Submit and track support tickets',
-      link: '/support'
+      title: 'Messagerie',
+      iconPath: 'assets/icons/message.svg',
+      description: 'Accédez à votre système de messagerie universitaire',
+      link: '/messaging'
     },
     {
-      title: 'Online Courses',
+      title: 'Cours en Ligne',
       iconPath: 'assets/icons/courses.svg',
-      description: 'Access your enrolled online courses',
+      description: 'Accédez à vos cours en ligne inscrits',
       link: '/courses'
     },
     {
-      title: 'ENT Assistance',
+      title: 'Assistance ENT',
       iconPath: 'assets/icons/assistance.svg',
-      description: 'Get help with the ENT platform',
+      description: 'Obtenez de l\'aide avec la plateforme ENT',
       link: '/assistance'
     }
   ];
 
-  adminTile: DashboardTile = {
-    title: 'User Management',
-    iconPath: 'assets/icons/message.svg', // You might want to add a proper icon for this
-    description: 'Manage user accounts and permissions',
-    link: '/user-management'
-  };
-  
   constructor(private router: Router, private authService: AuthNewService) {}
-  
+
   async ngOnInit() {
     try {
       if (!this.authService.isAuthenticated) {
         this.router.navigate(['/login']);
         return;
       }
-
-      // Get user info from the new auth service
       const userInfo = await this.authService.loadCurrentUser().toPromise();
       this.userInfo = userInfo;
-      this.isAdmin = this.authService.isUserInRole('admin');
-      
-      // If user is admin, add the admin tile
-      if (this.isAdmin) {
-        this.dashboardTiles = [...this.dashboardTiles, this.adminTile];
-      }
     } catch (error) {
       console.error('Error in dashboard initialization:', error);
       this.router.navigate(['/login']);
     }
   }
-  
+
   async logout() {
     try {
       await this.authService.logout();
@@ -98,5 +72,9 @@ export class DashboardComponent implements OnInit {
     } catch (error) {
       console.error('Logout failed:', error);
     }
+  }
+
+  trackByTile(index: number, tile: DashboardTile): string {
+    return tile.title;
   }
 }

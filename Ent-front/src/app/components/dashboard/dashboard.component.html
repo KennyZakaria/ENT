@@ -1,22 +1,242 @@
 <div class="dashboard-container">
+  <!-- Header avec dégradé et effets -->
   <header class="dashboard-header">
-    <h1>University Digital Workspace</h1>
-    <div class="user-info">
-      <span class="username">Welcome, {{ userInfo?.firstName || 'User' }}</span>
-      <button class="logout-btn" (click)="logout()">Logout</button>
+    <div class="header-content">
+      <!-- Logo et titre -->
+      <div class="header-left">
+        <div class="logo-container">
+          <div class="university-logo">
+            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 3L1 9L12 15L21 12.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="header-title">
+          <h1 class="main-title">Espace Numérique Universitaire</h1>
+          <p class="subtitle">Tableau de bord étudiant</p>
+        </div>
+      </div>
+
+      <!-- Informations utilisateur et actions -->
+      <div class="header-right">
+        <div class="user-profile">
+          <div class="user-avatar">
+            <span class="avatar-text">{{ (userInfo?.firstName || 'U')[0] }}</span>
+          </div>
+          <div class="user-details">
+            <span class="username">{{ userInfo?.firstName || 'Utilisateur' }}</span>
+            <span class="user-role">Étudiant</span>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <button class="notification-btn">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-3.5-3.5M9 17H4l3.5-3.5M12 3v18"/>
+            </svg>
+            <span class="notification-badge">3</span>
+          </button>
+          
+          <button class="logout-btn" (click)="logout()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H3"/>
+            </svg>
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
-  
+
+  <!-- Section de bienvenue -->
+  <div class="welcome-section">
+    <div class="welcome-content">
+      <div class="welcome-text">
+        <h2 class="welcome-title">
+          Bonjour {{ userInfo?.firstName || 'Étudiant' }} ! 👋
+        </h2>
+        <p class="welcome-message">
+          Voici votre espace personnel. Accédez rapidement à tous vos services universitaires.
+        </p>
+      </div>
+      
+      <div class="quick-stats">
+        <div class="stat-card">
+          <div class="stat-icon bg-blue-500">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-number">4</span>
+            <span class="stat-label">Cours actifs</span>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon bg-green-500">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-number">2</span>
+            <span class="stat-label">Examens proches</span>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon bg-purple-500">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-number">7</span>
+            <span class="stat-label">Messages</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services disponibles -->
   <div class="dashboard-content">
+    <div class="section-header">
+      <h3 class="section-title">Services Disponibles</h3>
+      <p class="section-subtitle">Accédez à tous vos outils universitaires</p>
+    </div>
+
     <div class="dashboard-tiles">
-      <div *ngFor="let tile of dashboardTiles" class="tile-wrapper">
-        <app-dashboard-tile 
-          [title]="tile.title" 
-          [iconPath]="tile.iconPath" 
-          [description]="tile.description" 
+      <div *ngFor="let tile of dashboardTiles; trackBy: trackByTile" class="tile-wrapper">
+        <app-dashboard-tile
+          [title]="tile.title"
+          [iconPath]="tile.iconPath"
+          [description]="tile.description"
           [link]="tile.link">
         </app-dashboard-tile>
       </div>
     </div>
   </div>
+
+  <div class="news-ticker-container">
+        <div class="news-ticker-wrapper">
+            <div class="news-label">
+                📢 Actualités
+            </div>
+            
+            <div class="news-ticker">
+                <div class="news-content" id="newsContent">
+                    <div class="news-item">
+                        <span class="news-badge urgent">Urgent</span>
+                        <span class="news-text">Nouvelle procédure d'inscription - Les inscriptions pour le semestre prochain sont ouvertes</span>
+                        <span class="news-time">Il y a 2h</span>
+                    </div>
+                    
+                    <div class="news-separator"></div>
+                    
+                    <div class="news-item">
+                        <span class="news-badge info">Info</span>
+                        <span class="news-text">Maintenance programmée - Le système sera indisponible demain de 2h à 4h</span>
+                        <span class="news-time">Il y a 1j</span>
+                    </div>
+                    
+                    <div class="news-separator"></div>
+                    
+                    <div class="news-item">
+                        <span class="news-badge success">Événement</span>
+                        <span class="news-text">Salon des métiers - Participez au salon des métiers du numérique le 25 juin</span>
+                        <span class="news-time">Il y a 3j</span>
+                    </div>
+                    
+                    <div class="news-separator"></div>
+                    
+                    <div class="news-item">
+                        <span class="news-badge info">Info</span>
+                        <span class="news-text">Nouveaux cours disponibles - Découvrez notre nouveau programme de formation en IA</span>
+                        <span class="news-time">Il y a 5j</span>
+                    </div>
+                    
+                    <div class="news-separator"></div>
+                    
+                    <div class="news-item">
+                        <span class="news-badge success">Succès</span>
+                        <span class="news-text">Félicitations aux diplômés de la promotion 2024 - Taux de réussite de 95%</span>
+                        <span class="news-time">Il y a 1 sem</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contrôles -->
+            <!-- <div class="news-controls">
+                <button class="control-btn" id="pauseBtn" title="Pause/Play">⏸️</button>
+                <button class="control-btn" id="speedBtn" title="Vitesse">⚡</button>
+            </div> -->
+        </div>
+    </div>
+
+    <script>
+        // Contrôles de la barre de news
+        const newsContent = document.getElementById('newsContent');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const speedBtn = document.getElementById('speedBtn');
+        
+        let isPaused = false;
+        let currentSpeed = 'normal'; // normal, fast, slow
+        
+        // Contrôle pause/play
+        pauseBtn.addEventListener('click', () => {
+            if (isPaused) {
+                newsContent.classList.remove('paused');
+                pauseBtn.innerHTML = '⏸️';
+                pauseBtn.title = 'Pause';
+            } else {
+                newsContent.classList.add('paused');
+                pauseBtn.innerHTML = '▶️';
+                pauseBtn.title = 'Play';
+            }
+            isPaused = !isPaused;
+        });
+        
+        // Contrôle de vitesse
+        speedBtn.addEventListener('click', () => {
+            newsContent.classList.remove('fast', 'slow');
+            
+            switch(currentSpeed) {
+                case 'normal':
+                    newsContent.classList.add('fast');
+                    currentSpeed = 'fast';
+                    speedBtn.innerHTML = '🚀';
+                    speedBtn.title = 'Vitesse rapide';
+                    break;
+                case 'fast':
+                    newsContent.classList.add('slow');
+                    currentSpeed = 'slow';
+                    speedBtn.innerHTML = '🐌';
+                    speedBtn.title = 'Vitesse lente';
+                    break;
+                case 'slow':
+                    currentSpeed = 'normal';
+                    speedBtn.innerHTML = '⚡';
+                    speedBtn.title = 'Vitesse normale';
+                    break;
+            }
+        });
+        
+        // Pause au survol (optionnel)
+        const tickerContainer = document.querySelector('.news-ticker-container');
+        
+        tickerContainer.addEventListener('mouseenter', () => {
+            if (!isPaused) {
+                newsContent.style.animationPlayState = 'paused';
+            }
+        });
+        
+        tickerContainer.addEventListener('mouseleave', () => {
+            if (!isPaused) {
+                newsContent.style.animationPlayState = 'running';
+            }
+        });
+    </script>
 </div>

@@ -1,12 +1,30 @@
 <div class="tile-container">
-  <div class="tile-icon">
-    <img [src]="iconPath" alt="{{ title }} icon">
-  </div>
-  <div class="tile-content">
-    <h3 class="tile-title">{{ title }}</h3>
-    <p class="tile-description">{{ description }}</p>
-  </div>
-  <div class="tile-action">
-    <a [routerLink]="link" class="tile-link">Access</a>
+  <div class="tile-inner">
+    <!-- Icône avec effet hover -->
+    <div class="tile-icon-wrapper">
+      <div class="tile-icon">
+        <img [src]="iconPath" [alt]="title + ' icon'" class="icon-image">
+      </div>
+      <div class="icon-backdrop"></div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="tile-content">
+      <h3 class="tile-title">{{ title }}</h3>
+      <p class="tile-description">{{ description }}</p>
+    </div>
+
+    <!-- Action avec flèche animée -->
+    <div class="tile-action">
+      <a [routerLink]="link" class="tile-link">
+        <span class="link-text">Accéder</span>
+        <svg class="link-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Effet de survol -->
+    <div class="tile-overlay"></div>
   </div>
 </div>

@@ -1,1 +1,45 @@
-<p>login works!</p>
+<div class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 px-4">
+    <div class="bg-white shadow-xl rounded-2xl w-full max-w-md p-8 space-y-6">
+      <div class="text-center">
+        <h1 class="text-3xl font-bold text-gray-800">Welcome Back</h1>
+        <p class="text-gray-500 text-sm mt-1">Please log in to your account</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <input 
+            id="username"
+            type="text"
+            formControlName="username"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-gray-50"
+          />
+          <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" class="text-red-500 text-sm mt-1">
+            Username is required
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input 
+            id="password"
+            type="password"
+            formControlName="password"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-gray-50"
+          />
+          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-red-500 text-sm mt-1">
+            Password is required
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          [disabled]="loginForm.invalid"
+          class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+          Login
+        </button>
+      </form>
+    </div>
+  </div>

@@ -1,0 +1,63 @@
+<div class="max-w-4xl mx-auto p-6 min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-2xl shadow-xl mb-6">
+    <div class="flex items-center gap-4">
+      <span class="text-3xl">🤖</span>
+      <h1 class="text-3xl font-bold tracking-tight">ENT Assistant</h1>
+    </div>
+  </div>
+
+  <!-- Chat Container -->
+  <div class="bg-white rounded-2xl shadow-xl border border-gray-100 flex flex-col max-h-[75vh] overflow-hidden">
+    <!-- Messages -->
+    <div #messagesContainer class="flex-1 overflow-y-auto p-6 space-y-4">
+      <div *ngFor="let message of messages" 
+           [ngClass]="message.type === 'user' ? 'justify-end' : 'justify-start'"
+           class="flex">
+        <div [ngClass]="message.type === 'user' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800'"
+             class="max-w-sm px-4 py-3 rounded-2xl shadow transition-all duration-300">
+          <p class="leading-relaxed">{{ message.text }}</p>
+          <span class="block text-xs mt-2 text-gray-400 text-right">
+            {{ message.timestamp | date:'short' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div *ngIf="isLoading" class="flex justify-start">
+        <div class="bg-gray-100 text-gray-800 px-4 py-3 rounded-2xl shadow">
+          <div class="flex gap-1 animate-pulse">
+            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:.1s]"></span>
+            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:.2s]"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="border-t border-gray-200 p-4 bg-gray-50">
+      <form (ngSubmit)="sendMessage()" #chatForm="ngForm" class="flex items-end gap-4">
+        <div class="relative flex-1">
+          <textarea
+            #messageInput
+            [(ngModel)]="currentMessage"
+            name="message"
+            placeholder="Type your question here..."
+            rows="1"
+            maxlength="500"
+            class="w-full resize-none px-4 py-3 border-2 border-gray-200 rounded-xl bg-white focus:outline-none focus:border-indigo-500 transition-colors duration-300">
+          </textarea>
+          <div class="absolute bottom-1 right-2 text-xs text-gray-400">
+            {{ currentMessage.length }}/500
+          </div>
+        </div>
+        <button type="submit"
+                [disabled]="isLoading || !currentMessage.trim()"
+                class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-2 px-6 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+          ➤
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

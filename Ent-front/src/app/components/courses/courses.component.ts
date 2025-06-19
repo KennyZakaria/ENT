@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { CourseDownloadService, Course } from '../../services/download.service';
 import { UploadService } from '../../services/upload.service';
 import { AuthNewService } from '../../services/auth-new.service';
-import { Sector, SECTORS } from '../../constants/sectors';
 import { environment } from '../../../environments/environment';
+import { Sector, UserManagementService } from '../../services/user-management.service';
 
 interface CourseUploadForm {
   title: string;
@@ -23,14 +23,14 @@ interface CourseUploadForm {
 })
 export class CoursesComponent implements OnInit {
   courses: Course[] = [];
-  sectors: Sector[] = SECTORS;
+  sectors: Sector[] = [];
   isTeacher = false;
   showUploadForm = false;
   uploadForm: CourseUploadForm = {
     title: '',
     description: '',
     file: null,
-    sector_id: SECTORS.length > 0 ? SECTORS[0].id.toString() : '',
+    sector_id: this.sectors.length > 0 ? this.sectors[0]!.id!.toString() : '',
   };
   isUploading = false;
   uploadMessage = '';
@@ -41,17 +41,33 @@ export class CoursesComponent implements OnInit {
   constructor(
     private courseService: CourseDownloadService,
     private uploadService: UploadService,
-    private authService: AuthNewService
+    private authService: AuthNewService,
+    private userService: UserManagementService,
   ) {}
 
   ngOnInit() {
     this.loadCourses();
     this.checkTeacherRole();
+
+    this.loadSectors();
   }
 
   private checkTeacherRole() {
     this.isTeacher = this.authService.isUserInRole('teacher');
     console.log('Is user teacher:', this.isTeacher);
+  }
+
+  loadSectors(): void {
+    this.userService.listSectors().subscribe({
+      next: (sectors) => {
+        this.sectors = sectors;
+ 
+      },
+      error: (error) => {
+        console.error('Failed to load sectors:', error);
+   
+      }
+    });
   }
 
   private loadCourses() {
@@ -89,7 +105,7 @@ export class CoursesComponent implements OnInit {
       this.uploadForm = { 
         title: '', 
         description: '', 
-        sector_id: SECTORS.length > 0 ? SECTORS[0].id.toString() : '', 
+        sector_id: this.sectors.length > 0 ? this.sectors[0].id!.toString() || '' : '', 
         file: null 
       };
       this.uploadMessage = '';
@@ -118,7 +134,7 @@ export class CoursesComponent implements OnInit {
         this.uploadForm.file,
         this.uploadForm.title,
         this.uploadForm.description,
-        this.uploadForm.sector_id,
+        this.uploadForm.sector_id.toString(),
         token
       ).toPromise();
 
@@ -128,7 +144,7 @@ export class CoursesComponent implements OnInit {
         this.uploadForm = { 
           title: '', 
           description: '', 
-          sector_id: SECTORS.length > 0 ? SECTORS[0].id.toString() : '', 
+          sector_id: this.sectors.length > 0 ? this.sectors[0].id!.toString() || '' : '', 
           file: null 
         };
         this.uploadMessage = '';

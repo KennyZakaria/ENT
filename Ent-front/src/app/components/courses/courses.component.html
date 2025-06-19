@@ -1,52 +1,200 @@
-<div class="courses-container">
-  <div class="header">
-    <h1>Online Courses</h1>
-    <button *ngIf="isTeacher" class="upload-btn" (click)="showUploadForm = true">Upload New Course</button>
+<div class="max-w-7xl mx-auto p-8 bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-8 rounded-2xl shadow-xl mb-8">
+    <div class="flex items-center justify-between">
+      <h1 class="text-4xl font-bold tracking-tight">Online Courses</h1>
+      <button 
+        *ngIf="isTeacher" 
+        class="bg-white/20 hover:bg-white/30 backdrop-blur-sm border-2 border-white/30 hover:border-white/50 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+        (click)="showUploadForm = true">
+        <span class="mr-2">📚</span>
+        Upload New Course
+      </button>
+    </div>
   </div>
 
   <!-- Upload Form Modal -->
-  <div *ngIf="showUploadForm" class="modal">
-    <div class="modal-content">
-      <h2>Upload New Course</h2>
-      <div *ngIf="uploadMessage" [class]="'alert ' + (uploadError ? 'alert-error' : 'alert-success')">
-        {{ uploadMessage }}
-      </div>
-      <form (submit)="uploadCourse($event)">
-        <div class="form-group">
-          <label for="title">Title:</label>
-          <input type="text" id="title" [(ngModel)]="uploadForm.title" name="title" required>
-        </div>        <div class="form-group">
-          <label for="description">Description:</label>
-          <textarea id="description" [(ngModel)]="uploadForm.description" name="description" required></textarea>
+  <div *ngIf="showUploadForm" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">Upload New Course</h2>
+          <button 
+            (click)="cancelUpload()" 
+            [disabled]="isUploading"
+            class="text-gray-400 hover:text-gray-600 text-2xl font-bold disabled:opacity-50">
+            ×
+          </button>
         </div>
-        <div class="form-group">          <label for="sector">Filière:</label>
-          <select id="sector" [(ngModel)]="uploadForm.sector_id" name="sector_id" required>
-            <option *ngFor="let sector of sectors" [value]="sector.id">{{ sector.libelle }}</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="file">Course File (Max {{ maxFileSize / (1024 * 1024) }}MB):</label>
-          <p class="file-info">Allowed types: PDF, ZIP, RAR, MP4, WEBM</p>
-          <input type="file" id="file" (change)="onFileSelected($event)" accept=".pdf,.zip,.rar,.mp4,.webm" required>
-          <div *ngIf="uploadForm.file" class="file-details">
-            Selected file: {{ uploadForm.file.name }} ({{ (uploadForm.file.size / (1024 * 1024)).toFixed(2) }}MB)
+
+        <!-- Alert Messages -->
+        <div *ngIf="uploadMessage" 
+             [ngClass]="{
+               'bg-red-50 border-red-200 text-red-700': uploadError,
+               'bg-green-50 border-green-200 text-green-700': !uploadError
+             }"
+             class="border rounded-xl p-4 mb-6">
+          <div class="flex items-center">
+            <span class="mr-2">{{ uploadError ? '❌' : '✅' }}</span>
+            {{ uploadMessage }}
           </div>
         </div>
-        <div class="button-group">
-          <button type="submit" [disabled]="!uploadForm.file || !uploadForm.title || !uploadForm.description || isUploading">
-            {{ isUploading ? 'Uploading...' : 'Upload' }}
-          </button>
-          <button type="button" (click)="cancelUpload()" [disabled]="isUploading">Cancel</button>
-        </div>
-      </form>
+
+        <form (submit)="uploadCourse($event)" class="space-y-6">
+          <!-- Title -->
+          <div class="form-group">
+            <label for="title" class="block text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              Title:
+            </label>
+            <input 
+              type="text" 
+              id="title" 
+              [(ngModel)]="uploadForm.title" 
+              name="title" 
+              required
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none transition-colors duration-300 bg-gray-50 focus:bg-white">
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="description" class="block text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              Description:
+            </label>
+            <textarea 
+              id="description" 
+              [(ngModel)]="uploadForm.description" 
+              name="description" 
+              required
+              rows="4"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none transition-colors duration-300 bg-gray-50 focus:bg-white resize-vertical">
+            </textarea>
+          </div>
+
+          <!-- Sector -->
+          <div class="form-group">
+            <label for="sector" class="block text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              Filière:
+            </label>
+            <select 
+              id="sector" 
+              [(ngModel)]="uploadForm.sector_id" 
+              name="sector_id" 
+              required
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none transition-colors duration-300 bg-gray-50 focus:bg-white">
+              <option *ngFor="let sector of sectors" [value]="sector.id">{{ sector.name }}</option>
+            </select>
+          </div>
+
+          <!-- File Upload -->
+          <div class="form-group">
+            <label for="file" class="block text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              Course File (Max {{ maxFileSize / (1024 * 1024) }}MB):
+            </label>
+            <p class="text-sm text-gray-500 mb-3 flex items-center">
+              <span class="mr-2">📎</span>
+              Allowed types: PDF, ZIP, RAR, MP4, WEBM
+            </p>
+            <div class="relative">
+              <input 
+                type="file" 
+                id="file" 
+                (change)="onFileSelected($event)" 
+                accept=".pdf,.zip,.rar,.mp4,.webm" 
+                required
+                class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl focus:border-indigo-500 focus:outline-none transition-colors duration-300 bg-gray-50 hover:bg-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 file:font-semibold hover:file:bg-indigo-100">
+            </div>
+            <div *ngIf="uploadForm.file" class="mt-3 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
+              <div class="flex items-center text-indigo-700">
+                <span class="mr-2">📄</span>
+                <div>
+                  <p class="font-semibold">{{ uploadForm.file.name }}</p>
+                  <p class="text-sm">{{ (uploadForm.file.size / (1024 * 1024)).toFixed(2) }}MB</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Button Group -->
+          <div class="flex gap-4 pt-4">
+            <button 
+              type="submit" 
+              [disabled]="!uploadForm.file || !uploadForm.title || !uploadForm.description || isUploading"
+              class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+              <span *ngIf="!isUploading" class="flex items-center justify-center">
+                <span class="mr-2">⬆️</span>
+                Upload
+              </span>
+              <span *ngIf="isUploading" class="flex items-center justify-center">
+                <span class="mr-2 animate-spin">⏳</span>
+                Uploading...
+              </span>
+            </button>
+            <button 
+              type="button" 
+              (click)="cancelUpload()" 
+              [disabled]="isUploading"
+              class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-300 border-2 border-gray-200 hover:border-gray-300 disabled:opacity-50">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
-  <div class="courses-grid">
-    <div *ngFor="let course of courses" class="course-card">
-      <h2>{{ course.title }}</h2>
-      <p>{{ course.description }}</p>
-      <button (click)="downloadCourse(course.id)">Download Course</button>
+  <!-- Courses Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div *ngFor="let course of courses" 
+         class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 overflow-hidden group">
+      
+      <!-- Card Header -->
+      <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 border-b border-gray-100">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <h2 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors duration-300">
+              {{ course.title }}
+            </h2>
+            <div class="flex items-center text-sm text-gray-500">
+              <span class="mr-2">📚</span>
+              Course Material
+            </div>
+          </div>
+          <div class="w-12 h-12 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl flex items-center justify-center text-white text-xl">
+            📖
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Body -->
+      <div class="p-6">
+        <p class="text-gray-600 mb-6 line-clamp-3 leading-relaxed">
+          {{ course.description }}
+        </p>
+
+        <!-- Download Button -->
+        <button 
+          (click)="downloadCourse(course.id)"
+          class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex items-center justify-center group">
+          <span class="mr-2 group-hover:animate-bounce">⬇️</span>
+          Download Course
+        </button>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="h-1 bg-gradient-to-r from-indigo-600 to-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
     </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="courses.length === 0" class="text-center py-16">
+    <div class="text-6xl mb-4">📚</div>
+    <h3 class="text-2xl font-bold text-gray-900 mb-2">No courses available</h3>
+    <p class="text-gray-600 mb-8">Check back later for new course uploads</p>
+    <button 
+      *ngIf="isTeacher"
+      (click)="showUploadForm = true"
+      class="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      Upload First Course
+    </button>
   </div>
 </div>

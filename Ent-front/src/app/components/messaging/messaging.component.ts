@@ -125,6 +125,7 @@ export class MessagingComponent implements OnInit, OnDestroy {
         type: 'subscribe',
         room_id: room.room_id
       });
+      
     }
   }
 
@@ -139,6 +140,7 @@ export class MessagingComponent implements OnInit, OnDestroy {
     this.messagingService.createMessage(message).subscribe({
       next: () => {
         this.newMessage = '';
+        this.loadMessages(this.selectedRoom!.room_id);
       },
       error: (error) => console.error('Error sending message:', error)
     });

@@ -9,6 +9,8 @@ import { UserManagementComponent } from './components/user-management/user-manag
 import { AuthComponent } from './components/auth/auth.component';
 import { MessagingComponent } from './components/messaging/messaging.component';
 
+import { EntAssistanceComponent } from './components/ent-assistance/ent-assistance.component';
+
 export const routes: Routes = [
   { 
     path: '', 
@@ -46,6 +48,12 @@ export const routes: Routes = [
     path: 'calendar',
     component: FullCalanderComponent,
     // No AuthGuard - calendar is publicly viewable
+  },
+  {
+    path: 'assistance',
+    component: EntAssistanceComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [] }  // No specific roles required, but still protected by authentication
   },
   {
     path: 'user-management',
