@@ -33,10 +33,13 @@ export class AuthNewService {
   constructor(private http: HttpClient) {
     // Try to restore session from localStorage
     const savedToken = localStorage.getItem('token');
+
+   
     if (savedToken) {
+      console.log("-----------saved token"+savedToken);
       const token = JSON.parse(savedToken);
       this.tokenSubject.next(token);
-      this.loadCurrentUser();
+       this.loadCurrentUser();
     }
   }
 
@@ -63,7 +66,7 @@ export class AuthNewService {
       tap(token => {
         localStorage.setItem('token', JSON.stringify(token));
         this.tokenSubject.next(token);
-        this.loadCurrentUser();
+       this.loadCurrentUser();
       })
     );
   }
@@ -88,9 +91,11 @@ export class AuthNewService {
   }
 
   loadCurrentUser(): Observable<KeycloakUser> {
+    console.log("-----------loadin user");
+    
     return this.http.get<KeycloakUser>(`${this.baseUrl}/me`).pipe(
       tap(user => {
-        console.log('user loaded:', user);
+        console.log('user---------- loaded:', user);
         
         this.currentUserSubject.next(user)
       })
@@ -104,6 +109,8 @@ export class AuthNewService {
   }
 
   public isUserInRole(role: string): boolean {
+    console.log('isUserInRole:', role, this.currentUser?.roles);
+    
     return this.currentUser?.roles.includes(role) ?? false;
   }
 }

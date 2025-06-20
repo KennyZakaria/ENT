@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Sector } from '../models/sector.model';
 import { KeycloakUser } from '../models/user.model';
+import { environment } from '../../environement';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SectorService {
-  private apiUrl = 'http://localhost:8003'; // Update with your actual API URL
+  private apiUrl = environment.apiUrl; // Update with your actual API URL
 
   constructor(private http: HttpClient) { }
 

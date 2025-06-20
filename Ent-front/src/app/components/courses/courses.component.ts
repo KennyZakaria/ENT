@@ -52,7 +52,8 @@ export class CoursesComponent implements OnInit {
     this.loadSectors();
   }
 
-  private checkTeacherRole() {
+  async  checkTeacherRole() {
+    const userInfo = await this.authService.loadCurrentUser().toPromise();
     this.isTeacher = this.authService.isUserInRole('teacher');
     console.log('Is user teacher:', this.isTeacher);
   }

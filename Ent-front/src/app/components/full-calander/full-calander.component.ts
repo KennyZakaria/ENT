@@ -170,6 +170,7 @@ export class FullCalanderComponent implements OnInit {
   }
 
   private async checkTeacherRole() {
+    const userInfo = await this.authService.loadCurrentUser().toPromise();
     this.isTeacher = this.authService.isUserInRole('teacher');
     console.log('Is user teacher:', this.isTeacher);
   }

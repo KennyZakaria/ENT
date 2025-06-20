@@ -189,6 +189,8 @@ services:
   # chatbot-rag services
   chatbot-backend:
     build: ./chatbot-rag/backend
+    ports:
+      - "2001:2001"
     env_file:
       - ./chatbot-rag/.env   
     volumes:
