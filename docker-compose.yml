@@ -191,13 +191,14 @@ services:
     build: ./chatbot-rag/backend
     ports:
       - "2001:2001"
+    env_file:
+      - ./chatbot-rag/.env   
     volumes:
       - ./chatbot-rag/backend:/app
       - ./chatbot-rag/backend/data:/app/data
       - ./chatbot-rag/frontend:/app/frontend
     environment:
       - PYTHONUNBUFFERED=1
-      - TOGETHER_API_KEY=${TOGETHER_API_KEY}
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - OLLAMA_MODEL=llama3
     networks:

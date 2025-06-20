@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Ent-fron": {
+    "ent-fron": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -51,10 +51,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "Ent-fron:build:production"
+              "buildTarget": "ent-fron:build:production"
             },
             "development": {
-              "buildTarget": "Ent-fron:build:development"
+              "buildTarget": "ent-fron:build:development"
             }
           },
           "defaultConfiguration": "development"

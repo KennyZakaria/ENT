@@ -19,33 +19,6 @@ import { AuthService } from '../../../services/auth.service';
     MatButtonModule,
     MatCardModule
   ],
-  // template: `
-  
-  //   <div class="login-container">
-  //     <mat-card>
-  //       <mat-card-header>
-  //         <mat-card-title>Login</mat-card-title>
-  //       </mat-card-header>
-  //       <mat-card-content>
-  //         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-  //           <mat-form-field appearance="fill">
-  //             <mat-label>Username</mat-label>
-  //             <input matInput formControlName="username" required>
-  //           </mat-form-field>
-            
-  //           <mat-form-field appearance="fill">
-  //             <mat-label>Password</mat-label>
-  //             <input matInput type="password" formControlName="password" required>
-  //           </mat-form-field>
-
-  //           <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
-  //             Login
-  //           </button>
-  //         </form>
-  //       </mat-card-content>
-  //     </mat-card>
-  //   </div>
-  // `,
   templateUrl: './login.component.html',
   styles: [`
     .login-container {

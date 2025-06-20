@@ -20,7 +20,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copy the build output to replace the default nginx contents
-COPY --from=build /app/dist/ent-fron /usr/share/nginx/html
+COPY --from=build /app/dist/ent-fron/browser /usr/share/nginx/html
 
 # Copy custom nginx config if needed
 COPY nginx.conf /etc/nginx/conf.d/default.conf

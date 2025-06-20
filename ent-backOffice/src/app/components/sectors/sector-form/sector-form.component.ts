@@ -19,35 +19,7 @@ import { SectorService } from '../../../services/sector.service';
     MatButtonModule,
     MatCardModule
   ],
-  template: `
-    <div class="container">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>Create New Sector</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <form [formGroup]="sectorForm" (ngSubmit)="onSubmit()">
-            <mat-form-field>
-              <mat-label>Name</mat-label>
-              <input matInput formControlName="name" required>
-            </mat-form-field>
-
-            <mat-form-field>
-              <mat-label>Description</mat-label>
-              <textarea matInput formControlName="description" rows="4"></textarea>
-            </mat-form-field>
-
-            <div class="button-row">
-              <button mat-button type="button" (click)="cancel()">Cancel</button>
-              <button mat-raised-button color="primary" type="submit" [disabled]="sectorForm.invalid">
-                Create Sector
-              </button>
-            </div>
-          </form>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  `,
+  templateUrl:'./sector-form.component.html',
   styles: [`
     .container {
       padding: 20px;
