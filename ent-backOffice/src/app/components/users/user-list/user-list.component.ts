@@ -78,25 +78,25 @@ import { KeycloakUser } from '../../../models/user.model';
   //   </div>
   // `,
   templateUrl: './user-list.component.html',
-  styles: [`
-    .container {
-      padding: 20px;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .actions {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-    table {
-      width: 100%;
-    }
-  `]
+  // styles: [`
+  //   .container {
+  //     padding: 20px;
+  //   }
+  //   .header {
+  //     display: flex;
+  //     justify-content: space-between;
+  //     align-items: center;
+  //     margin-bottom: 20px;
+  //   }
+  //   .actions {
+  //     display: flex;
+  //     gap: 16px;
+  //     align-items: center;
+  //   }
+  //   table {
+  //     width: 100%;
+  //   }
+  // `]
 })
 export class UserListComponent implements OnInit {
   users: KeycloakUser[] = [];

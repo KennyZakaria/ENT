@@ -24,84 +24,24 @@ import { Sector } from '../../../models/sector.model';
     MatCardModule
   ],
   templateUrl: './user-form.component.html',
-  // template: `
-  //   <div class="container">
-  //     <mat-card>
-  //       <mat-card-header>
-  //         <mat-card-title>Create New User</mat-card-title>
-  //       </mat-card-header>
-  //       <mat-card-content>
-  //         <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-  //           <mat-form-field>
-  //             <mat-label>Username</mat-label>
-  //             <input matInput formControlName="username" required>
-  //           </mat-form-field>
 
-  //           <mat-form-field>
-  //             <mat-label>Email</mat-label>
-  //             <input matInput type="email" formControlName="email" required>
-  //           </mat-form-field>
-
-  //           <mat-form-field>
-  //             <mat-label>Password</mat-label>
-  //             <input matInput type="password" formControlName="password" required>
-  //           </mat-form-field>
-
-  //           <mat-form-field>
-  //             <mat-label>First Name</mat-label>
-  //             <input matInput formControlName="first_name" required>
-  //           </mat-form-field>
-
-  //           <mat-form-field>
-  //             <mat-label>Last Name</mat-label>
-  //             <input matInput formControlName="last_name" required>
-  //           </mat-form-field>
-
-  //           <mat-form-field>
-  //             <mat-label>Role</mat-label>
-  //             <mat-select formControlName="role" required>
-  //               <mat-option value="teacher">Teacher</mat-option>
-  //               <mat-option value="student">Student</mat-option>
-  //             </mat-select>
-  //           </mat-form-field>
-
-  //           <mat-form-field>
-  //             <mat-label>Sectors</mat-label>
-  //             <mat-select formControlName="sector_ids" multiple required>
-  //               <mat-option *ngFor="let sector of sectors" [value]="sector.id">
-  //                 {{sector.name}}
-  //               </mat-option>
-  //             </mat-select>
-  //           </mat-form-field>
-
-  //           <div class="button-row">
-  //             <button mat-button type="button" (click)="cancel()">Cancel</button>
-  //             <button mat-raised-button color="primary" type="submit" [disabled]="userForm.invalid">
-  //               Create User
-  //             </button>
-  //           </div>
-  //         </form>
-  //       </mat-card-content>
-  //     </mat-card>
-  //   </div>
-  // `,
-  styles: [`
-    .container {
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .button-row {
-      display: flex;
-      justify-content: flex-end;
-      gap: 16px;
-    }
-  `]
+  // styles: [`
+  //   .container {
+  //     padding: 20px;
+  //     max-width: 800px;
+  //     margin: 0 auto;
+  //   }
+  //   form {
+  //     display: flex;
+  //     flex-direction: column;
+  //     gap: 16px;
+  //   }
+  //   .button-row {
+  //     display: flex;
+  //     justify-content: flex-end;
+  //     gap: 16px;
+  //   }
+  // `]
 })
 export class UserFormComponent implements OnInit {
   userForm: FormGroup;
@@ -140,6 +80,35 @@ export class UserFormComponent implements OnInit {
     });
   }
 
+  isTeacherRole(): boolean {
+    return this.userForm.get('role')?.value === 'teacher';
+  }
+  
+  onRoleChange() {
+    const role = this.userForm.get('role')?.value;
+  
+    if (role === 'teacher') {
+      this.userForm.get('sector_ids')?.setValue([]); // Reset
+    } else if (role === 'student') {
+      this.userForm.get('sector_ids')?.setValue(''); // Set to single string value
+    }
+  }
+  
+  onSectorCheckboxChange(event: Event) {
+    const checkbox = event.target as HTMLInputElement;
+    const selectedSectors: any[] = this.userForm.value.sector_ids || [];
+  
+    if (checkbox.checked) {
+      selectedSectors.push(checkbox.value);
+    } else {
+      const index = selectedSectors.indexOf(checkbox.value);
+      if (index >= 0) {
+        selectedSectors.splice(index, 1);
+      }
+    }
+  
+    this.userForm.get('sector_ids')?.setValue(selectedSectors);
+  }
   onSubmit() {
     if (this.userForm.valid) {
       this.userService.createUser(this.userForm.value).subscribe({

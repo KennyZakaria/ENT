@@ -17,47 +17,7 @@ import { Sector } from '../../../models/sector.model';
     MatCardModule,
   ],
   templateUrl: './sector-list.component.html',
-  // template: `
-  //   <div class="container">
-  //     <mat-card>
-  //       <mat-card-header>
-  //         <mat-card-title>
-  //           <div class="header">
-  //             <h1>Sectors</h1>
-  //             <button mat-raised-button color="primary" (click)="createSector()">
-  //               <mat-icon>add</mat-icon>
-  //               New Sector
-  //             </button>
-  //           </div>
-  //         </mat-card-title>
-  //       </mat-card-header>
-  //       <mat-card-content>
-  //         <div class="table-container">
-  //           <table class="sectors-table">
-  //             <thead>
-  //               <tr>
-  //                 <th>Name</th>
-  //                 <th>Description</th>
-  //                 <th>Actions</th>
-  //               </tr>
-  //             </thead>
-  //             <tbody>
-  //               <tr *ngFor="let sector of sectors">
-  //                 <td>{{sector.name}}</td>
-  //                 <td>{{sector.description}}</td>
-  //                 <td class="actions-column">
-  //                   <button mat-icon-button color="primary" (click)="viewUsers(sector)">
-  //                     <mat-icon>people</mat-icon>
-  //                   </button>
-  //                 </td>
-  //               </tr>
-  //             </tbody>
-  //           </table>
-  //         </div>
-  //       </mat-card-content>
-  //     </mat-card>
-  //   </div>
-  // `,
+
   styles: [`
     .container {
       padding: 20px;

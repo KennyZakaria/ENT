@@ -19,24 +19,24 @@ import { SectorService } from '../../../services/sector.service';
     MatButtonModule,
     MatCardModule
   ],
-  templateUrl:'./sector-form.component.html',
-  styles: [`
-    .container {
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .button-row {
-      display: flex;
-      justify-content: flex-end;
-      gap: 16px;
-    }
-  `]
+  templateUrl: './sector-form.component.html',
+  // styles: [`
+  //   .container {
+  //     padding: 20px;
+  //     max-width: 800px;
+  //     margin: 0 auto;
+  //   }
+  //   form {
+  //     display: flex;
+  //     flex-direction: column;
+  //     gap: 16px;
+  //   }
+  //   .button-row {
+  //     display: flex;
+  //     justify-content: flex-end;
+  //     gap: 16px;
+  //   }
+  // `]
 })
 export class SectorFormComponent {
   sectorForm: FormGroup;
