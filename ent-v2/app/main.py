@@ -35,7 +35,7 @@ security = HTTPBearer()
 
 # MinIO configuration
 minio_client = Minio(
-    endpoint=os.getenv("MINIO_ENDPOINT", "localhost:9000"),
+    endpoint=os.getenv("MINIO_ENDPOINT", "192.168.1.90:9000"),
     access_key=os.getenv("MINIO_ACCESS_KEY", "minioadmin"),
     secret_key=os.getenv("MINIO_SECRET_KEY", "minioadmin"),
     secure=os.getenv("MINIO_SECURE", "False").lower() == "true",
@@ -45,7 +45,7 @@ minio_client = Minio(
 cassandra_client = CassandraClient()
 
 # Keycloak configuration
-KEYCLOAK_URL = os.getenv("KEYCLOAK_URL", "http://localhost:8080")
+KEYCLOAK_URL = os.getenv("KEYCLOAK_URL", "http://192.168.1.90:8080")
 KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM", "master")
 KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID", "  ")
 
