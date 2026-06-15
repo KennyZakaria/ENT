@@ -3,12 +3,12 @@ from minio import Minio
 from urllib.parse import urlparse
 
 # MinIO configuration
-MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT", "minio:9000")
+MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT", "192.168.1.90:9000")
 MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY", "minioadmin")
 MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY", "minioadmin")
 MINIO_SECURE = os.environ.get("MINIO_SECURE", "False").lower() == "true"
 MINIO_BUCKET_NAME = os.environ.get("MINIO_BUCKET_NAME", "courses")
-MINIO_PUBLIC_URL = os.environ.get("MINIO_PUBLIC_URL", "http://localhost:9000")
+MINIO_PUBLIC_URL = os.environ.get("MINIO_PUBLIC_URL", "http://192.168.1.90:9000")
 
 # MinIO client cache
 _minio_client = None

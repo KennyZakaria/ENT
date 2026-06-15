@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Token } from '../models/auth.model';
 import { KeycloakUser } from '../models/user.model';
+import { environment } from '../../environement';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8003'; // Update with your actual API URL
-
+  // private apiUrl = environment.apiUrl; // Update with your actual API URL
+ private apiUrl = 'http://localhost:8003';
   constructor(private http: HttpClient) { }
 
   login(username: string, password: string): Observable<Token> {

@@ -90,26 +90,50 @@ export class UserFormComponent implements OnInit {
     if (role === 'teacher') {
       this.userForm.get('sector_ids')?.setValue([]); // Reset
     } else if (role === 'student') {
-      this.userForm.get('sector_ids')?.setValue(''); // Set to single string value
+      this.userForm.get('sector_ids')?.setValue([]); // Set to single string value
     }
   }
   
+  // onSectorCheckboxChange(event: Event) {
+  //   const checkbox = event.target as HTMLInputElement;
+  //   const selectedSectors: any[] = this.userForm.value.sector_ids || [];
+  
+  //   if (checkbox.checked) {
+  //     selectedSectors.push(checkbox.value);
+  //   } else {
+  //     const index = selectedSectors.indexOf(checkbox.value);
+  //     if (index >= 0) {
+  //       selectedSectors.splice(index, 1);
+  //     }
+  //   }
+  
+  //   this.userForm.get('sector_ids')?.setValue(selectedSectors);
+  // }
   onSectorCheckboxChange(event: Event) {
-    const checkbox = event.target as HTMLInputElement;
-    const selectedSectors: any[] = this.userForm.value.sector_ids || [];
-  
-    if (checkbox.checked) {
-      selectedSectors.push(checkbox.value);
-    } else {
-      const index = selectedSectors.indexOf(checkbox.value);
-      if (index >= 0) {
-        selectedSectors.splice(index, 1);
-      }
+  const checkbox = event.target as HTMLInputElement;
+  const selected: string[] = this.userForm.get('sector_ids')?.value || [];
+
+  if (checkbox.checked) {
+    if (!selected.includes(checkbox.value)) {
+      selected.push(checkbox.value);
     }
-  
-    this.userForm.get('sector_ids')?.setValue(selectedSectors);
+  } else {
+    const index = selected.indexOf(checkbox.value);
+    if (index > -1) {
+      selected.splice(index, 1);
+    }
   }
+
+  this.userForm.get('sector_ids')?.setValue([...selected]);
+}
+
+onStudentSectorChange(event: Event) {
+  const selectedId = (event.target as HTMLSelectElement).value;
+  this.userForm.get('sector_ids')?.setValue([selectedId]); // Ensure it's always an array
+}
   onSubmit() {
+    console.log(this.userForm.value);
+    
     if (this.userForm.valid) {
       this.userService.createUser(this.userForm.value).subscribe({
         next: () => {

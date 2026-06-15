@@ -177,43 +177,39 @@ async def list_courses():
 async def generate_download_url(course_id: str):
     """Generate a secure download URL for a course file."""
     try:
-        # Get Cassandra session
         session = get_cassandra_session()
-        
-        course_uuid = UUID(course_id)
-        
-        # Query course from Cassandra
+
+        try:
+            course_uuid = UUID(course_id)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid course ID format")
+
         query = "SELECT id, title, url FROM course_files.files WHERE id = %s"
         row = session.execute(query, [course_uuid]).one()
-        
+
         if not row:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Course with ID {course_id} not found"
             )
-        
-        minio_client = get_minio_client()
-        bucket_name = os.environ.get("MINIO_BUCKET_NAME", "courses")
-        expiry_seconds = int(os.environ.get("PRESIGNED_URL_EXPIRY", 3600))
-        expiry = timedelta(seconds=expiry_seconds)
 
         full_url = row["url"]
         parsed_url = urlparse(full_url)
         object_path = parsed_url.path.lstrip("/")
 
-        # Remove redundant "courses/" prefix if already present in object path
+        bucket_name = os.environ.get("MINIO_BUCKET_NAME", "courses")
         if object_path.startswith(f"{bucket_name}/"):
             object_path = object_path[len(bucket_name)+1:]
 
-        print(f"[DEBUG] Cleaned object path: {object_path}")
+        minio_client = get_minio_client()
+        expiry_seconds = int(os.environ.get("PRESIGNED_URL_EXPIRY", 3600))
+        expiry = timedelta(seconds=expiry_seconds)
 
         url = minio_client.presigned_get_object(
             bucket_name=bucket_name,
             object_name=object_path,
             expires=expiry
         )
-
-        print(f"[DEBUG] Generated download URL: {url}")
 
         return DownloadResponse(download_url=url)
 
@@ -222,7 +218,6 @@ async def generate_download_url(course_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate download URL: {str(e)}"
         )
-
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""

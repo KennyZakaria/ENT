@@ -9,8 +9,8 @@ import { environment } from '../../environement';
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = environment.apiUrl; // Update with your actual API URL
-
+  // private apiUrl = environment.apiUrl; // Update with your actual API URL
+ private apiUrl = 'http://localhost:8003';
   constructor(private http: HttpClient) { }
 
   getUsers(role?: string): Observable<KeycloakUser[]> {
